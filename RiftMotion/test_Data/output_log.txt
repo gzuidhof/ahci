@@ -1,0 +1,29 @@
+Initialize engine version: 5.2.2f1 (3757309da7e7)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: AMD Radeon R9 200 Series (ID=0x6810)
+    Vendor:   ATI
+    VRAM:     2027 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.Networking.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\System.Core.dll (this message is harmless)
+- Completed reload, in  0.130 seconds
+desktop: 1680x1050 60Hz; virtual: 2960x1050 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+Platform assembly: C:\Users\Luc\Documents\GitHub\ahci\RiftMotion\test_Data\Managed\System.dll (this message is harmless)
+Setting up 1 worker threads for Enlighten.
+  Thread -> id: 55fc -> priority: 1 
