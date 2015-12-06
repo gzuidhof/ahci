@@ -4,13 +4,19 @@ using System.Collections;
 using System.Reflection;
 using UnityEngine.EventSystems;
 
+
 namespace TalesFromTheRift
 {
-	public class CanvasKeyboard : MonoBehaviour 
-	{
-		#region CanvasKeyboard Instantiation
+    
 
-		public enum CanvasKeyboardType
+    public class CanvasKeyboard : MonoBehaviour 
+	{
+        //public SuggestAPI suggestor;
+        public GameObject outputfield;
+
+        #region CanvasKeyboard Instantiation
+
+        public enum CanvasKeyboardType
 		{
 			ASCIICapable
 		}
@@ -19,13 +25,15 @@ namespace TalesFromTheRift
 		{
 			// Don't open the keyboard if it is already open for the current input object
 			CanvasKeyboard keyboard = GameObject.FindObjectOfType<CanvasKeyboard>();
+            
 			if (keyboard == null || (keyboard != null && keyboard.inputObject != inputObject))
 			{
 				Close();
 				keyboard = Instantiate<CanvasKeyboard>(Resources.Load<CanvasKeyboard>("CanvasKeyboard"));
 				keyboard.transform.SetParent(canvas.transform, false);
-				keyboard.inputObject = inputObject;
-			}
+				//keyboard.inputObject = inputObject;
+                
+            }
 			return keyboard;
 		}
 		
@@ -116,6 +124,39 @@ namespace TalesFromTheRift
 		}
 
 		#endregion
+
+        public string getSuggestion()
+        {
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(text);
+            string[] suggestion = response.suggestions;
+
+            int i = 0;
+            foreach (string s in suggestion)
+            {
+                i++;
+                Debug.Log("suggestion"+i+": " + s);
+            }
+
+            Debug.Log("Error: " + response.error);
+
+            if (outputfield != null && response.error == "None" && suggestion.Length>0)
+            {
+                Component[] components = outputfield.GetComponents(typeof(Component));
+                foreach (Component component in components)
+                {
+                    PropertyInfo prop = component.GetType().GetProperty("text", BindingFlags.Instance | BindingFlags.Public);
+                    if (prop != null)
+                    {
+                        string currentText = prop.GetValue(component, null) as string;
+                        prop.SetValue(component, currentText + " " + suggestion[0],null);
+                        return suggestion[0];
+                    
+                    }
+                }
+                
+            }
+            return null;
+        }
 
 
 		#region Steal Focus Workaround

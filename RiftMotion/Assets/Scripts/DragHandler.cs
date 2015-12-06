@@ -57,6 +57,7 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
     {
         String input = keyboard.text;
         Debug.Log(input);
+        keyboard.getSuggestion();
         keyboard.text = "";
        
     }
