@@ -148,8 +148,9 @@ namespace TalesFromTheRift
                     if (prop != null)
                     {
                         string currentText = prop.GetValue(component, null) as string;
-                        prop.SetValue(component, currentText + " " + suggestion[0],null);
-                        return suggestion[0];
+                        string word = suggestion[suggestion.Length-1];
+                        prop.SetValue(component, currentText + " " + word,null);
+                        return word;
                     
                     }
                 }
