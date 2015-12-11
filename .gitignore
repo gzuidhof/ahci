@@ -21,3 +21,4 @@
 sysinfo.txt
 *.spyderproject
 swypy/.spyderworkspace
+*.pyc
