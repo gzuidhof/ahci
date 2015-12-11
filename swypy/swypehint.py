@@ -95,6 +95,7 @@ def determine_paths(current, goal):
 def paths_to_swipehint(paths): #String paths
     if len(paths) == 0:
         return ''
+
     shint = ''
     n = len(paths[0])
     for i in xrange(n):
@@ -144,21 +145,22 @@ def calculate_swipehints():
     for letter in letters: #Duplicate letters have no swipehint
         hints[letter+letter] = ''
 
-    #Postprocessing, filtering some letters in the paths
-    #If two letters are on the same row of the keyboard, remove letters
-    #from other rows
-    for key, value in hints.iteritems():
-        letter1, letter2 = (key[0],key[1])
+    if False:
+        #Postprocessing, filtering some letters in the paths
+        #If two letters are on the same row of the keyboard, remove letters
+        #from other rows
+        for key, value in hints.iteritems():
+            letter1, letter2 = (key[0],key[1])
 
-        x1,y1 = letter_to_coord(letter1)
-        x2,y2 = letter_to_coord(letter2)
+            x1,y1 = letter_to_coord(letter1)
+            x2,y2 = letter_to_coord(letter2)
 
-        if y1 == y2:
-            print key, hints[key]
-            row_letters = LAYOUT[y1]
-            hints[key] = ''.join([letter for letter in row_letters if letter not in row_letters])
+            if y1 == y2:
+                print key, hints[key]
+                row_letters = LAYOUT[y1]
+                hints[key] = ''.join([letter for letter in row_letters if letter not in row_letters])
 
-            print key, hints[key]
+                print key, hints[key]
 
     with open('hints.p','w') as f:
         pickle.dump(hints, f)
@@ -180,18 +182,19 @@ HINTS = load_or_calculate_swipehints()
 def swipehint(word):
     shint = ''
 
-    #Make word alphanumeric (hasn't -> hasnt)
+    #Make word alpha (hasn't -> hasnt)
     word = re.sub("[^a-zA-Z]","", word).lower()
 
     for i in xrange(len(word)-1):
+        shint += word[i]
         letter1= word[i]
         letter2= word[i+1]
         #print word, letter1, letter2
         shint += HINTS[letter1+letter2]
-    print word, shint
+    #print word, shint
+    shint += word[-1]
     return shint
 
 
 if __name__ == '__main__':
-    #print swipehint_for_letters('z','p')
     print swipehint('hello')
