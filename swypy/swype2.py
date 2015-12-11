@@ -4,6 +4,7 @@ from operator import itemgetter
 import swypehint as sh
 
 WORDS = open('wordlist.txt').read().split()
+SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
 
 def prune_word(query, word):
     return not word[:1] in query[:3]
@@ -19,11 +20,9 @@ def edit_distance(word1, word2):
 def get_suggestions(query, n=5):
     results = []
 
-    for word in WORDS:
+    for word, hint in zip(WORDS,SWYPE_HINTS):
         if prune_word(query, word):
             continue
-
-        hint = sh.swipehint(word)
 
         if prune_swipehint(query, hint):
             continue
