@@ -5,7 +5,6 @@ import swypehint as sh
 
 WORDS = open('wordlist.txt').read().split()
 
-
 def prune_word(query, word):
     return not word[:1] in query[:1]
 
@@ -13,8 +12,6 @@ def prune_swipehint(query, swipehint):
     if len(query) > len(swipehint)+3:
         return True
     return False
-
-
 
 def edit_distance(word1, word2):
     return levenshtein(word1, word2)
@@ -51,6 +48,10 @@ if __name__ == '__main__':
     'vghjioiuhgvcxsasdvbhuiklkjhgfdsaserty', # vocabulary
     ]
 
-    #for test in test_cases:
-        #print test, get_suggestions(test)
-    print get_suggestions('heqerqllo')
+    actual = ['hello', 'quick','world','doctor','architecture',
+        'agriculture','music','vocabulary']
+
+    for query, word in zip(test_cases,actual):
+        print word,query
+        print get_suggestions(query, 5), '\n'
+    #print get_suggestions('heqerqllo')
