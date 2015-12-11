@@ -10,6 +10,12 @@ import re
 #Keyboard layout
 LAYOUT = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
 
+#Diagonal keyboard movements?
+DIAGONAL = True
+
+#Remove diagonal paths when letters are on same row
+STRAIGHT_ROWS = True
+
 # Check whether coord is within keyboard bounds
 def valid_coord(coord):
     x, y = coord
@@ -32,15 +38,16 @@ def get_next_options(coord):
     options.append((x,y+1))
     options.append((x,y-1))
 
-    if y == 0:
-        options.append((x-1,y+1)) #w>a
-    if y == 1:
-        options.append((x+1,y-1)) #g>y
-        options.append((x-1,y+1)) #g>v
-        options.append((x-2,y+1)) #g>c
-    if y == 2:
-        options.append((x+1,y-1)) #x>d
-        options.append((x+2,y-1)) #v>h
+    if DIAGONAL:
+        if y == 0:
+            options.append((x-1,y+1)) #w>a
+        if y == 1:
+            options.append((x+1,y-1)) #g>y
+            options.append((x-1,y+1)) #g>v
+            options.append((x-2,y+1)) #g>c
+        if y == 2:
+            options.append((x+1,y-1)) #x>d
+            options.append((x+2,y-1)) #v>h
 
     return [c for c in options if valid_coord(c)]
 
@@ -84,6 +91,7 @@ def determine_paths(current, goal):
         if current == goal:
             results.append(so_far)
             shortest_path = len(so_far)
+            break
 
         for option in get_next_options(current):
             queue.put((option, so_far+[current]))
@@ -111,7 +119,7 @@ def swipehint_for_letters(letter1, letter2):
     start = letter_to_coord(letter1)
     goal = letter_to_coord(letter2)
 
-    paths = determine_paths(start,goal)
+    paths = [determine_paths(start,goal)[0]]
     letter_paths = []
     for path in paths:
         letters = ''.join([coord_to_letter(coord) for coord in path])
@@ -145,7 +153,7 @@ def calculate_swipehints():
     for letter in letters: #Duplicate letters have no swipehint
         hints[letter+letter] = ''
 
-    if False:
+    if STRAIGHT_ROWS:
         #Postprocessing, filtering some letters in the paths
         #If two letters are on the same row of the keyboard, remove letters
         #from other rows
@@ -156,11 +164,11 @@ def calculate_swipehints():
             x2,y2 = letter_to_coord(letter2)
 
             if y1 == y2:
-                print key, hints[key]
+                #print key, hints[key]
                 row_letters = LAYOUT[y1]
-                hints[key] = ''.join([letter for letter in row_letters if letter not in row_letters])
+                hints[key] = ''.join([letter for letter in value if letter in row_letters])
 
-                print key, hints[key]
+                #print key, hints[key]
 
     with open('hints.p','w') as f:
         pickle.dump(hints, f)

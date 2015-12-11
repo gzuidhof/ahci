@@ -6,7 +6,7 @@ import swypehint as sh
 WORDS = open('wordlist.txt').read().split()
 
 def prune_word(query, word):
-    return not word[:1] in query[:1]
+    return not word[:1] in query[:3]
 
 def prune_swipehint(query, swipehint):
     if len(query) > len(swipehint)+3:
@@ -38,7 +38,7 @@ def get_suggestions(query, n=5):
 
 
 if __name__ == '__main__':
-    test_cases = ['heqerqllo',               # hello
+    test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick
     'wertyuioiuytrtghjklkjhgfd',             # world
     'dfghjioijhgvcftyuioiuytr',              # doctor
@@ -48,7 +48,7 @@ if __name__ == '__main__':
     'vghjioiuhgvcxsasdvbhuiklkjhgfdsaserty', # vocabulary
     ]
 
-    actual = ['hello', 'quick','world','doctor','architecture',
+    actual = ['hello','quick','world','doctor','architecture',
         'agriculture','music','vocabulary']
 
     for query, word in zip(test_cases,actual):
