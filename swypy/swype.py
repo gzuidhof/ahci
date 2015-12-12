@@ -59,7 +59,7 @@ def get_minimum_wordlength(path):
     compressed_row_numbers = compress(row_numbers)
     return len(compressed_row_numbers) - 3
 
-def get_suggestion(path):
+def get_suggestions(path):
     """ Returns suggestions for a given path. """
 
     suggestions = filter(lambda x: x[0] == path[0] and x[-1] == path[-1], WORDS)
@@ -82,4 +82,4 @@ if __name__ == '__main__':
         ]
 
     for test in test_cases:
-        print get_suggestion(test)
+        print get_suggestions(test)

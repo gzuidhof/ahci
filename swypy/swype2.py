@@ -35,7 +35,6 @@ def get_suggestions(query, n=5):
     return results[:n]
 
 
-
 if __name__ == '__main__':
     test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick
