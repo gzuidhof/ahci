@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from levenshtein import levenshtein
 from operator import itemgetter
+import math
 import swypehint as sh
 
 WORDS = open('wordlist.txt').read().split()
@@ -10,7 +11,7 @@ def prune_word(query, word):
     return not word[:1] in query[:3]
 
 def prune_swipehint(query, swipehint):
-    if len(query) > len(swipehint)+3:
+    if abs(len(query) - len(swipehint)) > 3:
         return True
     return False
 
