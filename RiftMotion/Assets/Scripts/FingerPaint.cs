@@ -9,6 +9,7 @@ using System.Reflection;
 public class FingerPaint : MonoBehaviour
 {
     public HandController LeapHandController;
+    public SwypeController swypeController;
     private String curChar;
     public GameObject outputfield;
     public GameObject inputObject;
@@ -48,6 +49,7 @@ void Awake()
         fingerdetect = false;
         linePoints = new List<Vector3>();
         curChar = " ";
+        swypeController = gameObject.AddComponent<SwypeController>();
     }
 
     // Update is called once per frame
@@ -78,7 +80,9 @@ void Awake()
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerUpHandler);
             if (fingerdetect)
             {
-                endWord();
+                swypeController.EndOfInput();
+                endWord();//clears line
+               
             }
 
             fingerdetect = false;
@@ -105,12 +109,13 @@ void Awake()
             
             if (Physics.Raycast(fingerTipPos, dir, out hit, 1000F))
             {
-                Debug.Log("Collided with: " + hit.collider.gameObject.name);
+               // Debug.Log("Collided with: " + hit.collider.gameObject.name);
                 if (hit.collider.gameObject.name != curChar && hit.collider.gameObject.name.Length == 1)
                 {
                     curChar = hit.collider.gameObject.name;
                     
                     text += curChar;
+                    swypeController.AddCharacter(curChar[0]);
                 }
             }
             
@@ -128,7 +133,7 @@ void Awake()
         //Verwijder lijn
         linePoints.Clear();
 
-        getSuggestion(); //Stopt het al in textveld
+        //getSuggestion(); //Stopt het al in textveld
         text = "";
 
     }
@@ -181,7 +186,7 @@ void Awake()
         foreach (string s in suggestion)
         {
             i++;
-            Debug.Log("suggestion" + i + ": " + s);
+            //Debug.Log("suggestion" + i + ": " + s);
         }
 
         Debug.Log("Error: " + response.error);
