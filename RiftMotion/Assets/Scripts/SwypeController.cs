@@ -39,6 +39,7 @@ public class SwypeController : MonoBehaviour
     public string[] EndOfInput()
     {
         string input = new string(charList.ToArray());
+        charList.Clear();
         
         Debug.Log("input string: " + input);
 
