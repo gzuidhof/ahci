@@ -10,10 +10,10 @@ def get_tasks():
     if query is not None and len(query) > 0:
         suggestions = swype.get_suggestions(query)
 
-        suggestions = zip(*suggestions)[1]
+        suggestions = zip(*suggestions)[1] if len(suggestions) > 0 else []
         return jsonify({'query':query, 'suggestions':suggestions, 'error':'None'})
     else:
-         return jsonify({'error':'No query argument given!', suggestions:[],query:None})
+         return jsonify({'error':'No query argument given!', 'suggestions':[],query:None})
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -1,17 +1,19 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+
 
 public class SwypeController : MonoBehaviour
 {
 
     private List<char>  charList;
     private readonly int nTopSuggestions = 3;
-    public GameObject OutputField;
     public GameObject[] SuggestionFields;
     public List<string> text;
+    public InputField OutputField;
     
 
 	// Use this for initialization
@@ -19,7 +21,6 @@ public class SwypeController : MonoBehaviour
         charList = new List<char>();
         text = new List<string>();
         SuggestionFields = new GameObject[nTopSuggestions];
-        OutputField = GameObject.FindGameObjectWithTag("TextOutput");
         for (int i = 0; i < nTopSuggestions; i++)
         {
             string tag = "SuggestionField" + i;
@@ -71,6 +72,8 @@ public class SwypeController : MonoBehaviour
 
     private void SetText(GameObject field, string s)
     {
+        field.GetComponent<Text>().text = s;
+        /*
         Component[] components = field.GetComponents(typeof(Component));
         foreach (Component component in components)
         {
@@ -81,6 +84,7 @@ public class SwypeController : MonoBehaviour
             }
 
         }
+        */
 
     }
 
@@ -95,7 +99,7 @@ public class SwypeController : MonoBehaviour
         }
         Debug.Log("Total text: " + output);
 
-        SetText(OutputField, output);
+        OutputField.text = output;
     }
 
 }

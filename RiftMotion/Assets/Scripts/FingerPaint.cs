@@ -49,7 +49,6 @@ void Awake()
         fingerdetect = false;
         linePoints = new List<Vector3>();
         curChar = " ";
-        swypeController = gameObject.AddComponent<SwypeController>();
     }
 
     // Update is called once per frame

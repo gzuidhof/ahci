@@ -8,10 +8,10 @@ WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
 
 def prune_word(query, word):
-    return not word[:1] in query[:3]
+    return not word[:1] in query[:1] or not word[-1] == query[-1]
 
 def prune_swipehint(query, swipehint):
-    if abs(len(query) - len(swipehint)) > 3:
+    if abs(len(query) - len(swipehint)) > 2:
         return True
     return False
 
