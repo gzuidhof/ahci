@@ -7,10 +7,11 @@ using UnityEngine.EventSystems;
 
 namespace TalesFromTheRift
 {
-    
 
     public class CanvasKeyboard : MonoBehaviour 
 	{
+        public SwypeController swyper;
+
         //public SuggestAPI suggestor;
         public GameObject outputfield;
 

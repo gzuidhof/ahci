@@ -35,22 +35,28 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        if(eventData.dragging)
+        
+        if(eventData.dragging && gameObject.name.Length == 1)
         {
-            
+            Debug.Log("Entering: " + gameObject.name);
             AddCharacter();
-
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        AddCharacter();
+        if (gameObject.name.Length == 1) {
+            AddCharacter();
+            Debug.Log("OnDown: " + gameObject.name);
+        }
+        
     }
 
     private void AddCharacter()
     {
-        keyboard.SendKeyString(gameObject.name);
+        Debug.Log("DragAdding: " + gameObject.name[0]);
+                
+        keyboard.swyper.AddCharacter(gameObject.name[0]);
     }
 
     private void DraggingDone()
@@ -58,13 +64,11 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
         String input = keyboard.text;
         Debug.Log(input);
         keyboard.getSuggestion();
-        keyboard.text = "";
-       
+        keyboard.text = "";       
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
-        Debug.Log("Dragging done!");
-        DraggingDone();
+        keyboard.swyper.EndOfInput();
     }
 }
