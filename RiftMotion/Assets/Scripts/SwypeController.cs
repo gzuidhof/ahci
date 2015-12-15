@@ -25,7 +25,7 @@ public class SwypeController : MonoBehaviour
         {
             string tag = "SuggestionField" + i;
             SuggestionFields[i] = GameObject.FindGameObjectWithTag((tag));
-            SetText(SuggestionFields[i], "Suggestion");
+            //SetText(SuggestionFields[i], "Suggestion");
         }
 
 
