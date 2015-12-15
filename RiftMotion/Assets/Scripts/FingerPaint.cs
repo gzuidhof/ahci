@@ -11,8 +11,6 @@ public class FingerPaint : MonoBehaviour
     public HandController LeapHandController;
     public SwypeController swypeController;
     private String curChar;
-    public GameObject outputfield;
-    public GameObject inputObject;
     private RaycastHit hit;
     public Camera camera;
     List<Vector3> linePoints;
@@ -80,8 +78,8 @@ void Awake()
             if (fingerdetect)
             {
                 swypeController.EndOfInput();
-                endWord();//clears line
-               
+                linePoints.Clear();
+
             }
 
             fingerdetect = false;
@@ -112,8 +110,6 @@ void Awake()
                 if (hit.collider.gameObject.name != curChar && hit.collider.gameObject.name.Length == 1)
                 {
                     curChar = hit.collider.gameObject.name;
-                    
-                    text += curChar;
                     swypeController.AddCharacter(curChar[0]);
                 }
             }
@@ -127,88 +123,6 @@ void Awake()
             }
         }
     }
-    private void endWord()
-    {
-        //Verwijder lijn
-        linePoints.Clear();
 
-        //getSuggestion(); //Stopt het al in textveld
-        text = "";
-
-    }
-
-    public string text
-    {
-        get
-        {
-            if (inputObject != null)
-            {
-                Component[] components = inputObject.GetComponents(typeof(Component));
-                foreach (Component component in components)
-                {
-                    PropertyInfo prop = component.GetType().GetProperty("text", BindingFlags.Instance | BindingFlags.Public);
-                    if (prop != null)
-                    {
-                        return prop.GetValue(component, null) as string; ;
-                    }
-                }
-                return inputObject.name;
-            }
-            return "";
-        }
-
-        set
-        {
-            if (inputObject != null)
-            {
-                Component[] components = inputObject.GetComponents(typeof(Component));
-                foreach (Component component in components)
-                {
-                    PropertyInfo prop = component.GetType().GetProperty("text", BindingFlags.Instance | BindingFlags.Public);
-                    if (prop != null)
-                    {
-                        prop.SetValue(component, value, null);
-                        return;
-                    }
-                }
-                inputObject.name = value;
-            }
-        }
-    }
-
-    public string getSuggestion()
-    {
-        SuggestAPIResponse response = SuggestAPI.GetSuggestions(text);
-        string[] suggestion = response.suggestions;
-
-        int i = 0;
-        foreach (string s in suggestion)
-        {
-            i++;
-            //Debug.Log("suggestion" + i + ": " + s);
-        }
-
-        Debug.Log("Error: " + response.error);
-
-        if (outputfield != null && response.error == "None" && suggestion.Length > 0)
-        {
-            Component[] components = outputfield.GetComponents(typeof(Component));
-            foreach (Component component in components)
-            {
-                PropertyInfo prop = component.GetType().GetProperty("text", BindingFlags.Instance | BindingFlags.Public);
-                if (prop != null)
-                {
-                    string currentText = prop.GetValue(component, null) as string;
-                    //string word = suggestion[suggestion.Length - 1];
-                    string word = suggestion[0]; //Take the first instead of the last
-                    prop.SetValue(component, currentText + " " + word, null);
-                    return word;
-
-                }
-            }
-
-        }
-        return null;
-    }
 
 }

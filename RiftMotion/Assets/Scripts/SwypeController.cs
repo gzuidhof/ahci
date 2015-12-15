@@ -14,6 +14,8 @@ public class SwypeController : MonoBehaviour
     public GameObject[] SuggestionFields;
     public List<string> text;
     public InputField OutputField;
+    public InputField InputString;
+
     
 
 	// Use this for initialization
@@ -35,6 +37,7 @@ public class SwypeController : MonoBehaviour
      public void AddCharacter(char character)
     {
         charList.Add(character);
+        InputString.text = new string(charList.ToArray());
     }
 
     public string[] EndOfInput()
