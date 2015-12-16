@@ -85,7 +85,7 @@ void Awake()
                     Vector3 dir = new Vector3(Mathf.Round(swiper.Direction.x), Mathf.Round(swiper.Direction.y), Mathf.Round(swiper.Direction.z));
 
                     Debug.Log("Swiping!: " + dir);
-                    if (dir.y == -1 && keyboard.isActiveAndEnabled)
+                    if (dir.y == -1 && keyboard.isActiveAndEnabled) // add swype speed
                         keyboard.CloseKeyboard();
                 }
             }
