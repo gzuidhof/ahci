@@ -5,11 +5,14 @@ using UnityEngine.EventSystems;
 using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using TalesFromTheRift;
 
 public class FingerPaint : MonoBehaviour
 {
     public HandController LeapHandController;
     public SwypeController swypeController;
+    public CanvasKeyboard keyboard;
+    private bool swiping;
     private String curChar;
     private RaycastHit hit;
     public Camera camera;
@@ -38,6 +41,7 @@ void Awake()
         //SampleListener listenerSubclass = new SampleListener();
         leapController.EnableGesture(Gesture.GestureType.TYPE_CIRCLE);
         leapController.EnableGesture(Gesture.GestureType.TYPE_KEY_TAP);
+        leapController.EnableGesture(Gesture.GestureType.TYPE_SWIPE);
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
         lineRenderer.SetVertexCount(0);
@@ -47,6 +51,7 @@ void Awake()
         fingerdetect = false;
         linePoints = new List<Vector3>();
         curChar = " ";
+        swiping = false;
     }
 
     // Update is called once per frame
@@ -57,7 +62,8 @@ void Awake()
        
         HandModel[] allGraphicHands = LeapHandController.GetAllGraphicsHands();
 
-        if (allGraphicHands.Length <= 0) return;
+        if (allGraphicHands.Length <= 0)
+            return;
         HandModel handModel = allGraphicHands[0];
 
         finger = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX];
@@ -66,8 +72,30 @@ void Awake()
 
         Frame frame = leapController.Frame();
         GestureList gestureInFrame = frame.Gestures();
+        bool swipeDetected = false;
 
-        if (handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_THUMB].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_MIDDLE].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_RING].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_PINKY].GetLeapFinger().IsExtended)
+        foreach (Gesture g in gestureInFrame)
+            if (!IsPointing(handModel) && g.Type == Gesture.GestureType.TYPE_SWIPE)
+            {
+                swipeDetected = true;
+                if (!swiping)
+                {
+                    swiping = true;
+                    SwipeGesture swiper = new SwipeGesture(g);
+                    Vector3 dir = new Vector3(Mathf.Round(swiper.Direction.x), Mathf.Round(swiper.Direction.y), Mathf.Round(swiper.Direction.z));
+
+                    Debug.Log("Swiping!: " + dir);
+                    if (dir.y == -1 && keyboard.isActiveAndEnabled)
+                        keyboard.CloseKeyboard();
+                }
+            }
+        if (!swipeDetected)
+            swiping = false;
+
+        
+
+
+        if (IsPointing(handModel))
         {
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerDownHandler);Hoe we een event willen executen
             fingerdetect = true;
@@ -84,16 +112,8 @@ void Awake()
 
             fingerdetect = false;
         }
-                
-                //enable event
-            
-       
 
-
-
-        //fingerdetect = (Input.GetKey(KeyCode.Space));
-
-        if (fingerdetect)
+        if (fingerdetect && keyboard.isActiveAndEnabled)
         {
             // Using named temp variables like this helps me think more clearly about the code
             Vector3 previousPoint = (linePoints.Count > 0) ? linePoints[linePoints.Count - 1] : new Vector3(-1000, -1000, -1000); // If you've never seen this before, it's called a ternary expression.
@@ -122,6 +142,11 @@ void Awake()
               //  Debug.Log(string.Format("Added point at: {0}!", fingerTipPos));
             }
         }
+    }
+
+    private bool IsPointing(HandModel handModel)
+    {
+        return handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_THUMB].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_MIDDLE].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_RING].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_PINKY].GetLeapFinger().IsExtended;
     }
 
 
