@@ -121,7 +121,8 @@ namespace TalesFromTheRift
 
 		public void CloseKeyboard()
 		{
-			Destroy(gameObject);
+            gameObject.SetActive(false);
+			//Destroy(gameObject);
 		}
 
 		#endregion

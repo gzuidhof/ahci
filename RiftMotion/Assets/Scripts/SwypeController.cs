@@ -46,9 +46,16 @@ public class SwypeController : MonoBehaviour
         charList.Clear();
         
         Debug.Log("input string: " + input);
+        string[] suggestions = new string[0];
 
-        SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);
-        string[] suggestions = response.suggestions;
+        if (input.Length > 0)
+        {
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);
+            suggestions = response.suggestions;
+        }
+
+
+        
 
         
         string[] topSuggestions = new string[nTopSuggestions];//not sure wat we hier mee willen doen, maar komt vast ooit van pas
@@ -75,7 +82,8 @@ public class SwypeController : MonoBehaviour
 
     private void SetText(GameObject field, string s)
     {
-        field.GetComponent<Text>().text = s;
+        if(field != null)
+            field.GetComponent<Text>().text = s;
         /*
         Component[] components = field.GetComponents(typeof(Component));
         foreach (Component component in components)
