@@ -15,13 +15,14 @@ public class FingerPaint : MonoBehaviour
     private bool swiping;
     private String curChar;
     private RaycastHit hit;
+    public Painter painter;
     public Camera camera;
-    List<Vector3> linePoints;
-    LineRenderer lineRenderer;
+    //List<Vector3> linePoints;
+    //LineRenderer lineRenderer;
     FingerModel finger;
     Controller leapController = new Controller();
     private bool fingerdetect;
-    private float newPointDelta = 0.02f;
+    
     private Vector3 fingerTipPos;
     private const UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
     private const UInt32 MOUSEEVENTF_LEFTUP = 0x0004;
@@ -42,14 +43,16 @@ void Awake()
         leapController.EnableGesture(Gesture.GestureType.TYPE_CIRCLE);
         leapController.EnableGesture(Gesture.GestureType.TYPE_KEY_TAP);
         leapController.EnableGesture(Gesture.GestureType.TYPE_SWIPE);
+        /*
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
         lineRenderer.SetVertexCount(0);
         lineRenderer.SetWidth(0.1f, 0.1f);
         lineRenderer.SetColors(Color.red, Color.red);
         lineRenderer.useWorldSpace = true;
-        fingerdetect = false;
         linePoints = new List<Vector3>();
+        */
+        fingerdetect = false;
         curChar = " ";
         swiping = false;
     }
@@ -106,8 +109,7 @@ void Awake()
             if (fingerdetect)
             {
                 swypeController.EndOfInput();
-                linePoints.Clear();
-
+                painter.removeLine();
             }
 
             fingerdetect = false;
@@ -115,31 +117,23 @@ void Awake()
 
         if (fingerdetect && keyboard.isActiveAndEnabled)
         {
-            // Using named temp variables like this helps me think more clearly about the code
-            Vector3 previousPoint = (linePoints.Count > 0) ? linePoints[linePoints.Count - 1] : new Vector3(-1000, -1000, -1000); // If you've never seen this before, it's called a ternary expression.
-                                                                                                                                  // It's just an if/else collapsed into a single line of code. 
-            
-            // Also, the crazy out of bounds initial value here ensures the starting point will always draw.
-            Vector3 dir = (fingerTipPos - camera.transform.position).normalized*30;
+            painter.addPoint(fingerTipPos);
+            fireRaycasts();
+        }
+    }
 
-            Debug.DrawRay(fingerTipPos, dir, Color.red, 1, true);
-            
-            if (Physics.Raycast(fingerTipPos, dir, out hit, 1000F))
+    private void fireRaycasts()
+    {
+        Vector3 dir = (fingerTipPos - camera.transform.position).normalized * 30;
+        Debug.DrawRay(fingerTipPos, dir, Color.red, 1, true);
+
+        if (Physics.Raycast(fingerTipPos, dir, out hit, 1000F))
+        {
+            // Debug.Log("Collided with: " + hit.collider.gameObject.name);
+            if (hit.collider.gameObject.name != curChar && hit.collider.gameObject.name.Length == 1)
             {
-               // Debug.Log("Collided with: " + hit.collider.gameObject.name);
-                if (hit.collider.gameObject.name != curChar && hit.collider.gameObject.name.Length == 1)
-                {
-                    curChar = hit.collider.gameObject.name;
-                    swypeController.AddCharacter(curChar[0]);
-                }
-            }
-            
-            if (Vector3.Distance(fingerTipPos, previousPoint) > newPointDelta)
-            {
-                linePoints.Add(fingerTipPos);
-                lineRenderer.SetVertexCount(linePoints.Count);
-                lineRenderer.SetPosition(linePoints.Count - 1, (Vector3)linePoints[linePoints.Count - 1]);
-              //  Debug.Log(string.Format("Added point at: {0}!", fingerTipPos));
+                curChar = hit.collider.gameObject.name;
+                swypeController.AddCharacter(curChar[0]);
             }
         }
     }
