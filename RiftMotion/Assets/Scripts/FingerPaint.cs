@@ -6,6 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using TalesFromTheRift;
+using System.Linq;
 
 public class FingerPaint : MonoBehaviour
 {
@@ -59,20 +60,21 @@ void Awake()
 
     // Update is called once per frame
     void Update()
-    {
-
-        var pointer = new PointerEventData(EventSystem.current);
-       
+    {        
         HandModel[] allGraphicHands = LeapHandController.GetAllGraphicsHands();
 
-        if (allGraphicHands.Length <= 0)
+        if (allGraphicHands.Length <= 0) //no hands present
             return;
-        HandModel handModel = allGraphicHands[0];
 
-        finger = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX];
+        HandModel handModel = allGraphicHands[0]; //only 1 hand? Might overthink this (I've got no better idea atm)
 
-        fingerTipPos = finger.GetTipPosition();
+        GestureUpdate(handModel); //handels gestures (eg for closing keyboard
+        PointingUpdate(handModel); //checks if pointing, sends raycasts and draws line
 
+    }
+
+    private void GestureUpdate(HandModel handModel)
+    {
         Frame frame = leapController.Frame();
         GestureList gestureInFrame = frame.Gestures();
         bool swipeDetected = false;
@@ -94,10 +96,10 @@ void Awake()
             }
         if (!swipeDetected)
             swiping = false;
+    }
 
-        
-
-
+    private void PointingUpdate(HandModel handModel)
+    {
         if (IsPointing(handModel))
         {
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerDownHandler);Hoe we een event willen executen
@@ -117,10 +119,13 @@ void Awake()
 
         if (fingerdetect && keyboard.isActiveAndEnabled)
         {
+            fingerTipPos = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition();
             painter.addPoint(fingerTipPos);
             fireRaycasts();
         }
     }
+
+
 
     private void fireRaycasts()
     {
@@ -137,10 +142,43 @@ void Awake()
             }
         }
     }
-
-    private bool IsPointing(HandModel handModel)
+    /// <summary>
+    /// Returns list of booleans for each finger that is extending.
+    /// Indices
+    /// Thumbs = 0
+    /// Indexfinger = 1
+    /// Middelfinger = 2
+    /// Ringfinger = 3
+    /// Littlefinger = 4
+    /// </summary>
+    /// <returns></returns>
+    private bool[] ExtendingFingers(HandModel hand)
     {
-        return handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_THUMB].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_MIDDLE].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_RING].GetLeapFinger().IsExtended && !handModel.fingers[(int)Finger.FingerType.TYPE_PINKY].GetLeapFinger().IsExtended;
+        bool[] extending = new bool[5];
+        for(int i = 0; i < extending.Length; i++)
+            extending[i] = hand.fingers[i].GetLeapFinger().IsExtended;
+
+        return extending;
+
+    }
+
+    private bool isFist(HandModel hand)
+    {
+        return ExtendingFingers(hand).Count(c => c) == 0; //no fingers are extended
+    }
+
+    private bool isOpenHand(HandModel hand)
+    {
+        return ExtendingFingers(hand).Count(c => c) == 5; //all fingers are stretched
+    }
+
+
+
+    private bool IsPointing(HandModel hand)
+    {
+        bool[] extending = ExtendingFingers(hand);
+        return extending[1] && extending.Count(c => c) == 1; //the indexfinger is extended and it is the only finger that is extended
+        
     }
 
 
