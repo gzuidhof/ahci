@@ -68,34 +68,58 @@ void Awake()
 
         HandModel handModel = allGraphicHands[0]; //only 1 hand? Might overthink this (I've got no better idea atm)
 
+
         GestureUpdate(handModel); //handels gestures (eg for closing keyboard
         PointingUpdate(handModel); //checks if pointing, sends raycasts and draws line
-
+        //selectUpdate(handModel);
     }
 
-    private void GestureUpdate(HandModel handModel)
+    private void SwipeGesture(Gesture g, HandModel hand)
+    {
+        bool swipeDetected = false;
+
+        if (!IsPointing(hand) && g.Type == Gesture.GestureType.TYPE_SWIPE)
+        {
+            swipeDetected = true;
+            if (!swiping)
+            {
+                swiping = true;
+                SwipeGesture swiper = new SwipeGesture(g);
+                Vector3 dir = new Vector3(Mathf.Round(swiper.Direction.x), Mathf.Round(swiper.Direction.y), Mathf.Round(swiper.Direction.z));
+
+                Debug.Log("Swiping!: " + dir);
+                if (dir.y == -1 && keyboard.isActiveAndEnabled) // add swype speed
+                    keyboard.CloseKeyboard();
+            }
+        }
+        if (!swipeDetected)
+            swiping = false;
+    }
+
+    private void SelectGesture(Gesture g, HandModel hand)
+    {
+        if (g.Type == Gesture.GestureType.TYPE_SCREEN_TAP || g.Type == Gesture.GestureType.TYPE_KEY_TAP) //Actually never sees the screen tap, need to check this out
+        {
+            Debug.Log("ScreenTap: ");
+        }
+    }
+
+
+
+
+
+    private void GestureUpdate(HandModel hand)
     {
         Frame frame = leapController.Frame();
         GestureList gestureInFrame = frame.Gestures();
-        bool swipeDetected = false;
+        
 
         foreach (Gesture g in gestureInFrame)
-            if (!IsPointing(handModel) && g.Type == Gesture.GestureType.TYPE_SWIPE)
-            {
-                swipeDetected = true;
-                if (!swiping)
-                {
-                    swiping = true;
-                    SwipeGesture swiper = new SwipeGesture(g);
-                    Vector3 dir = new Vector3(Mathf.Round(swiper.Direction.x), Mathf.Round(swiper.Direction.y), Mathf.Round(swiper.Direction.z));
-
-                    Debug.Log("Swiping!: " + dir);
-                    if (dir.y == -1 && keyboard.isActiveAndEnabled) // add swype speed
-                        keyboard.CloseKeyboard();
-                }
-            }
-        if (!swipeDetected)
-            swiping = false;
+        {
+            SwipeGesture(g, hand); //checks if it is a swipe gesture and takes action if needed
+            SelectGesture(g, hand);
+        }
+           
     }
 
     private void PointingUpdate(HandModel handModel)
