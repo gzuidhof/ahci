@@ -18,7 +18,7 @@ def prune_word(query, word):
     return not word[:1] in query[:2] #or not word[-1] == query[-1]
 
 def prune_swipehint(query, swipehint):
-    if abs(len(query) - len(swipehint)) > 6:
+    if abs(len(query) - len(swipehint)) > 5:
         return True
     return False
 
@@ -59,6 +59,10 @@ def init():
         pool = Pool(processes=N_PROCESSES)
 
 def run_test_cases():
+    import time
+
+
+
     test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick
     'wertyuioiuytrtghjklkjhgfd',             # world
@@ -73,8 +77,9 @@ def run_test_cases():
         'agriculture','music','vocabulary']
 
     for query, word in zip(test_cases,actual):
+        t = time.time()
         print word,query
-        print get_suggestions(query, 5), '\n'
+        print get_suggestions(query, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
 
 #Use this for benchmarking
 #python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"
