@@ -3,40 +3,55 @@ from levenshtein import levenshtein
 from operator import itemgetter
 import math
 import swypehint as sh
+import multiprocessing
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
 
+MULTIPROCESS = False
+N_PROCESSES = multiprocessing.cpu_count()
+
 def prune_word(query, word):
-    return not word[:1] in query[:1] or not word[-1] == query[-1]
+    return not word[:1] in query[:2] #or not word[-1] == query[-1]
 
 def prune_swipehint(query, swipehint):
-    if abs(len(query) - len(swipehint)) > 2:
+    if abs(len(query) - len(swipehint)) > 6:
         return True
     return False
 
 def edit_distance(word1, word2):
     return levenshtein(word1, word2)
 
+#Score of a word (edit distance, or pruned => None)
+def score(query_word_hint_tup):
+    query, word, hint = query_word_hint_tup
+    if prune_word(query, word):
+        return None
+    if prune_swipehint(query, hint):
+        return None
+
+    return edit_distance(query, hint), word
+
+
 def get_suggestions(query, n=5):
     results = []
+    todo = zip([query]*len(WORDS), WORDS,SWYPE_HINTS)
 
-    for word, hint in zip(WORDS,SWYPE_HINTS):
-        if prune_word(query, word):
-            continue
+    if MULTIPROCESS:
+        results = pool.map(score, todo)
+    else:
+        results = map(score, todo)
 
-        if prune_swipehint(query, hint):
-            continue
-
-        distance = edit_distance(query, hint)
-        results.append( (distance, word))
-
+    results = filter(None, results)
     results = sorted(results,key=itemgetter(0))
 
     return results[:n]
 
+def init():
+    global pool
+    pool = multiprocessing.Pool(processes=N_PROCESSES)
 
-if __name__ == '__main__':
+def run_test_cases():
     test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick
     'wertyuioiuytrtghjklkjhgfd',             # world
@@ -53,4 +68,9 @@ if __name__ == '__main__':
     for query, word in zip(test_cases,actual):
         print word,query
         print get_suggestions(query, 5), '\n'
-    #print get_suggestions('heqerqllo')
+
+#python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"
+
+if __name__ == '__main__':
+    init()
+    run_test_cases()
