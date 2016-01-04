@@ -8,7 +8,7 @@ using System.Reflection;
 using TalesFromTheRift;
 using System.Linq;
 
-public class FingerPaint : MonoBehaviour
+public class GuestureController : MonoBehaviour
 {
     public HandController LeapHandController;
     public SwypeController swypeController;
@@ -99,7 +99,9 @@ void Awake()
     {
         if (g.Type == Gesture.GestureType.TYPE_SCREEN_TAP || g.Type == Gesture.GestureType.TYPE_KEY_TAP) //Actually never sees the screen tap, need to check this out
         {
+            fireRaycasts();
             Debug.Log("ScreenTap: ");
+
         }
     }
 

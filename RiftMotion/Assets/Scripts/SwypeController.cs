@@ -17,7 +17,8 @@ public class SwypeController : MonoBehaviour
     public InputField InputString;
     private int selectionBegin;
     private int selectionEnd;
-    private bool selectionChanged;
+    private int anchorOld;
+    private int focusOld; 
 
     
 
@@ -32,9 +33,8 @@ public class SwypeController : MonoBehaviour
             SuggestionFields[i] = GameObject.FindGameObjectWithTag((tag));
             //SetText(SuggestionFields[i], "Suggestion");
         }
-        selectionBegin = -1;
-        selectionEnd = -1;
-        selectionChanged = false;
+        anchorOld = -1;
+        focusOld = -1;
 
 
 
@@ -131,10 +131,10 @@ public class SwypeController : MonoBehaviour
         {
             int anchor = OutputField.selectionAnchorPosition;
             int focus = OutputField.selectionFocusPosition;
-            if(anchor != selectionBegin && focus != selectionBegin || anchor != selectionEnd && focus != selectionEnd)
+
+            if (anchor != anchorOld || focus != focusOld)
             {
-                selectionChanged = true;
-                if(anchor < focus)
+                if (anchor < focus)
                 {
                     //dragging from left to right
                     selectionBegin = anchor;
@@ -146,18 +146,16 @@ public class SwypeController : MonoBehaviour
                     selectionBegin = focus;
                     selectionEnd = anchor;
                 }
+
+                anchorOld = anchor;
+                focusOld = focus;
+
+                Debug.Log("Selctionbegin: " + selectionBegin + " SelectionEnd: " + selectionEnd);
+                Debug.Log("Anchor: " + OutputField.selectionAnchorPosition + " Focus: " + OutputField.selectionFocusPosition);
+                Debug.Log("Selected: " + new string(OutputField.text.Skip(selectionBegin).Take(selectionEnd - selectionBegin).ToArray()));
             }
-        }
 
-        if(selectionChanged)
-        {
-            selectionChanged = false;
-            Debug.Log("Selctionbegin: " + selectionBegin + " SelectionEnd: " + selectionEnd);
-            Debug.Log("Anchor: " + OutputField.selectionAnchorPosition + " Focus: " + OutputField.selectionFocusPosition);
-            Debug.Log("Selected: " + new string(OutputField.text.Skip(selectionBegin).Take(selectionEnd-selectionBegin).ToArray()));
-        }
-
-                   
+        }                 
         
     }
 
