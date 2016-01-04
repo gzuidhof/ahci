@@ -1,16 +1,18 @@
 # -*- coding: utf-8 -*-
-from levenshtein import levenshtein
 from operator import itemgetter
 import math
 import swypehint as sh
-import multiprocessing
+from multiprocessing import Pool, cpu_count
+from multiprocessing.pool import ThreadPool
 import pylev
+import Levenshtein as lv
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
 
-MULTIPROCESS = True
-N_PROCESSES = multiprocessing.cpu_count()
+MULTIPROCESS = False
+MULTITHREAD = False
+N_PROCESSES = cpu_count()
 
 def prune_word(query, word):
     return not word[:1] in query[:2] #or not word[-1] == query[-1]
@@ -21,7 +23,8 @@ def prune_swipehint(query, swipehint):
     return False
 
 def edit_distance(word1, word2):
-    return pylev.levenshtein(word1, word2)
+    #return pylev.levenshtein(word1, word2)
+    return lv.distance(word1, word2)
 
 #Score of a word (edit distance, or pruned => None)
 def score(query_word_hint_tup):
@@ -50,7 +53,10 @@ def get_suggestions(query, n=5):
 
 def init():
     global pool
-    pool = multiprocessing.Pool(processes=N_PROCESSES)
+    if MULTITHREAD:
+        pool = ThreadPool(processes=N_PROCESSES)
+    else:
+        pool = Pool(processes=N_PROCESSES)
 
 def run_test_cases():
     test_cases = ['hytrerfghjkllo',          # hello
@@ -70,6 +76,7 @@ def run_test_cases():
         print word,query
         print get_suggestions(query, 5), '\n'
 
+#Use this for benchmarking
 #python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"
 
 if __name__ == '__main__':
