@@ -86,7 +86,6 @@ void Awake()
                 SwipeGesture swiper = new SwipeGesture(g);
                 Vector3 dir = new Vector3(Mathf.Round(swiper.Direction.x), Mathf.Round(swiper.Direction.y), Mathf.Round(swiper.Direction.z));
 
-                Debug.Log("Swiping!: " + dir);
                 if (dir.y == -1 && keyboard.isActiveAndEnabled) // add swype speed
                     keyboard.CloseKeyboard();
             }
@@ -99,7 +98,7 @@ void Awake()
     {
         if (g.Type == Gesture.GestureType.TYPE_SCREEN_TAP || g.Type == Gesture.GestureType.TYPE_KEY_TAP) //Actually never sees the screen tap, need to check this out
         {
-            Debug.Log("Tapping");
+
             GameObject tapped = fireRaycasts(hand.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition());
             if (tapped != null)
                 checkObjectTap(tapped);
