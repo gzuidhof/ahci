@@ -4,11 +4,12 @@ from operator import itemgetter
 import math
 import swypehint as sh
 import multiprocessing
+import pylev
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
 
-MULTIPROCESS = False
+MULTIPROCESS = True
 N_PROCESSES = multiprocessing.cpu_count()
 
 def prune_word(query, word):
@@ -20,7 +21,7 @@ def prune_swipehint(query, swipehint):
     return False
 
 def edit_distance(word1, word2):
-    return levenshtein(word1, word2)
+    return pylev.levenshtein(word1, word2)
 
 #Score of a word (edit distance, or pruned => None)
 def score(query_word_hint_tup):
