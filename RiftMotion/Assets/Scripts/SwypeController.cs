@@ -54,23 +54,29 @@ public class SwypeController : MonoBehaviour
 
     public string[] EndOfInput()
     {
+        string[] topSuggestions = new string[nTopSuggestions];//not sure wat we hier mee willen doen, maar komt vast ooit van pas
         string input = new string(charList.ToArray());
         charList.Clear();
         
         Debug.Log("input string: " + input);
         string[] suggestions = new string[0];
 
-        if (input.Length > 0)
+        if (input.Length > 1)
         {
             SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);
             suggestions = response.suggestions;
+        }
+        else if(input.Length == 1)// user types 1 single character
+        {
+            addToTextField(input);
+            return topSuggestions;
         }
 
 
         
 
         
-        string[] topSuggestions = new string[nTopSuggestions];//not sure wat we hier mee willen doen, maar komt vast ooit van pas
+        
         for (int i = 0; i < nTopSuggestions; i++)
         {
             if (suggestions.Length > i)
@@ -118,7 +124,10 @@ public class SwypeController : MonoBehaviour
         foreach(string s in text)
         {
             Debug.Log(s);
-            output += s + " ";
+            if (s.Length > 1)
+                output += s + " ";
+            else
+                output += s;
         }
         Debug.Log("Total text: " + output);
 

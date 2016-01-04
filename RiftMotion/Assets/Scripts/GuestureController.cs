@@ -145,14 +145,39 @@ void Awake()
         if (fingerdetect && keyboard.isActiveAndEnabled)
         {
             fingerTipPos = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition();
-            painter.addPoint(fingerTipPos);
-            fireRaycasts();
+            GameObject hit = fireRaycasts();
+            if (hit != null)
+                checkObject(hit);
+            
         }
     }
 
 
+    private void checkObject(GameObject hit)
+    {
+        if (hit.name.Length == 1 && hit.name != curChar)
+        {
+            curChar = hit.name;
+            swypeController.AddCharacter(curChar[0]);
+        }
+        if(partOfKeyBoard(hit))
+            painter.addPoint(fingerTipPos);
 
-    private void fireRaycasts()
+    }
+
+    private bool partOfKeyBoard(GameObject entity)
+    {
+
+        if (entity.CompareTag("Keyboard"))
+            return true;
+        else if (entity.transform.parent != null)
+            return partOfKeyBoard(entity.transform.parent.gameObject);
+        else 
+            return false;
+    }
+
+
+    private GameObject fireRaycasts()
     {
         Vector3 dir = (fingerTipPos - camera.transform.position).normalized * 30;
         Debug.DrawRay(fingerTipPos, dir, Color.red, 1, true);
@@ -160,12 +185,10 @@ void Awake()
         if (Physics.Raycast(fingerTipPos, dir, out hit, 1000F))
         {
             // Debug.Log("Collided with: " + hit.collider.gameObject.name);
-            if (hit.collider.gameObject.name != curChar && hit.collider.gameObject.name.Length == 1)
-            {
-                curChar = hit.collider.gameObject.name;
-                swypeController.AddCharacter(curChar[0]);
-            }
+            return hit.collider.gameObject;
         }
+        else
+            return null;
     }
     /// <summary>
     /// Returns list of booleans for each finger that is extending.
