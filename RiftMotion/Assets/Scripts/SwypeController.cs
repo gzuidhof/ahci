@@ -15,6 +15,9 @@ public class SwypeController : MonoBehaviour
     public List<string> text;
     public InputField OutputField;
     public InputField InputString;
+    private int selectionBegin;
+    private int selectionEnd;
+    private bool selectionChanged;
 
     
 
@@ -29,10 +32,19 @@ public class SwypeController : MonoBehaviour
             SuggestionFields[i] = GameObject.FindGameObjectWithTag((tag));
             //SetText(SuggestionFields[i], "Suggestion");
         }
+        selectionBegin = -1;
+        selectionEnd = -1;
+        selectionChanged = false;
 
 
 
 	}
+
+    public void Update()
+    {
+        GetHighlightedText();
+    }
+
 	
      public void AddCharacter(char character)
     {
@@ -111,6 +123,42 @@ public class SwypeController : MonoBehaviour
         Debug.Log("Total text: " + output);
 
         OutputField.text = output;
+    }
+
+    public void GetHighlightedText()
+    {
+        if (OutputField)//Outputfield sometimes throws a nullreference exception for no apperent reason
+        {
+            int anchor = OutputField.selectionAnchorPosition;
+            int focus = OutputField.selectionFocusPosition;
+            if(anchor != selectionBegin && focus != selectionBegin || anchor != selectionEnd && focus != selectionEnd)
+            {
+                selectionChanged = true;
+                if(anchor < focus)
+                {
+                    //dragging from left to right
+                    selectionBegin = anchor;
+                    selectionEnd = focus;
+                }
+                else
+                {
+                    //dragging from right tot left
+                    selectionBegin = focus;
+                    selectionEnd = anchor;
+                }
+            }
+        }
+
+        if(selectionChanged)
+        {
+            selectionChanged = false;
+            Debug.Log("Selctionbegin: " + selectionBegin + " SelectionEnd: " + selectionEnd);
+            Debug.Log("Anchor: " + OutputField.selectionAnchorPosition + " Focus: " + OutputField.selectionFocusPosition);
+            Debug.Log("Selected: " + new string(OutputField.text.Skip(selectionBegin).Take(selectionEnd-selectionBegin).ToArray()));
+        }
+
+                   
+        
     }
 
 }

@@ -71,7 +71,6 @@ void Awake()
 
         GestureUpdate(handModel); //handels gestures (eg for closing keyboard
         PointingUpdate(handModel); //checks if pointing, sends raycasts and draws line
-        //selectUpdate(handModel);
     }
 
     private void SwipeGesture(Gesture g, HandModel hand)
