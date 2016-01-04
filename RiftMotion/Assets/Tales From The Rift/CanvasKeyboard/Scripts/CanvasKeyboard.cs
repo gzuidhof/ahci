@@ -125,6 +125,11 @@ namespace TalesFromTheRift
 			//Destroy(gameObject);
 		}
 
+        public void OpenKeyboard()
+        {
+            gameObject.SetActive(true);
+        }
+
 		#endregion
 
         public string getSuggestion()

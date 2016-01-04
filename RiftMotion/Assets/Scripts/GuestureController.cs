@@ -99,15 +99,13 @@ void Awake()
     {
         if (g.Type == Gesture.GestureType.TYPE_SCREEN_TAP || g.Type == Gesture.GestureType.TYPE_KEY_TAP) //Actually never sees the screen tap, need to check this out
         {
-            fireRaycasts();
-            Debug.Log("ScreenTap: ");
+            Debug.Log("Tapping");
+            GameObject tapped = fireRaycasts(hand.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition());
+            if (tapped != null)
+                checkObjectTap(tapped);
 
         }
     }
-
-
-
-
 
     private void GestureUpdate(HandModel hand)
     {
@@ -135,7 +133,8 @@ void Awake()
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerUpHandler);
             if (fingerdetect)
             {
-                swypeController.EndOfInput();
+                if(keyboard.isActiveAndEnabled) //Otherwise causes nullpointer exeptions
+                    swypeController.EndOfInput();
                 painter.removeLine();
             }
 
@@ -145,17 +144,39 @@ void Awake()
         if (fingerdetect && keyboard.isActiveAndEnabled)
         {
             fingerTipPos = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition();
-            GameObject hit = fireRaycasts();
+            GameObject hit = fireRaycasts(fingerTipPos);
             if (hit != null)
-                checkObject(hit);
+                checkObjectDrag(hit);
             
         }
     }
 
-
-    private void checkObject(GameObject hit)
+    private void checkObjectTap(GameObject tapped)
     {
-        if (hit.name.Length == 1 && hit.name != curChar)
+        if (tapped.CompareTag("TextOutput") && !keyboard.isActiveAndEnabled)
+            keyboard.OpenKeyboard();
+
+
+        if (tapped.CompareTag("SuggestionField"))
+        {
+            swypeController.setSuggestion(int.Parse(tapped.name[tapped.name.Length - 1].ToString()));
+        }
+        else if (tapped.CompareTag("Key") && tapped.name != curChar)
+        {
+            curChar = tapped.name;
+            swypeController.Typing(curChar[0]);
+        }
+        else if(tapped.CompareTag("Space"))
+        {
+            swypeController.Typing(' ');
+        }
+        
+
+    }
+
+    private void checkObjectDrag(GameObject hit)
+    {
+        if (hit.CompareTag("Key") && hit.name != curChar)
         {
             curChar = hit.name;
             swypeController.AddCharacter(curChar[0]);
@@ -177,12 +198,12 @@ void Awake()
     }
 
 
-    private GameObject fireRaycasts()
+    private GameObject fireRaycasts(Vector3 pos)
     {
-        Vector3 dir = (fingerTipPos - camera.transform.position).normalized * 30;
-        Debug.DrawRay(fingerTipPos, dir, Color.red, 1, true);
+        Vector3 dir = (pos - camera.transform.position).normalized * 30;
+        Debug.DrawRay(pos, dir, Color.red, 1, true);
 
-        if (Physics.Raycast(fingerTipPos, dir, out hit, 1000F))
+        if (Physics.Raycast(pos, dir, out hit, 1000F))
         {
             // Debug.Log("Collided with: " + hit.collider.gameObject.name);
             return hit.collider.gameObject;
