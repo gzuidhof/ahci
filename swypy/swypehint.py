@@ -91,7 +91,7 @@ def determine_paths(current, goal):
         if current == goal:
             results.append(so_far)
             shortest_path = len(so_far)
-            break
+            #break
 
         for option in get_next_options(current):
             queue.put((option, so_far+[current]))
@@ -127,6 +127,17 @@ def swipehint_for_letters(letter1, letter2):
 
     return paths_to_swipehint(letter_paths)
 
+def all_swipehints_for_letters(letter1, letter2):
+    start = letter_to_coord(letter1)
+    goal = letter_to_coord(letter2)
+
+    paths = determine_paths(start,goal)
+    letter_paths = []
+    for path in paths:
+        letters = ''.join([coord_to_letter(coord) for coord in path])
+        letter_paths.append(letters)
+
+    return letter_paths
 
 def calculate_swipehints():
     print "First time swipehint setup"
@@ -136,42 +147,25 @@ def calculate_swipehints():
     letters = 'abcdefghijklmnopqrstuvwxyz'
     letter_combinations = list(itertools.combinations(letters, 2))
 
-    hints = {}
+    hints_dict = {}
 
     #For all unique combinations of letters (where (a,b)==(b,a))
     for i, combo in enumerate(letter_combinations):
         print i+1, '/', len(letter_combinations), combo
         a,b = combo
-        hint = swipehint_for_letters(a,b)
-
-        hints[a+b] = hint
-        hints[b+a] = hint[::-1]
-        print '\t{0} -> {1} = {2}'.format(a,b,hints[a+b])
-        print '\t{0} -> {1} = {2}'.format(b,a,hints[b+a])
+        hints = all_swipehints_for_letters(a,b)
+        hints_reversed = [hint[::-1] for hint in hints]
+        hints_dict[a+b] = hints
+        hints_dict[b+a] = hints_reversed
+        print '\t{0} -> {1} = {2}'.format(a,b,hints_dict[a+b])
+        print '\t{0} -> {1} = {2}'.format(b,a,hints_dict[b+a])
 
     #i.e. path from l to l in hello is empty
     for letter in letters: #Duplicate letters have no swipehint
-        hints[letter+letter] = ''
-
-    if STRAIGHT_ROWS:
-        #Postprocessing, filtering some letters in the paths
-        #If two letters are on the same row of the keyboard, remove letters
-        #from other rows
-        for key, value in hints.iteritems():
-            letter1, letter2 = (key[0],key[1])
-
-            x1,y1 = letter_to_coord(letter1)
-            x2,y2 = letter_to_coord(letter2)
-
-            if y1 == y2:
-                #print key, hints[key]
-                row_letters = LAYOUT[y1]
-                hints[key] = ''.join([letter for letter in value if letter in row_letters])
-
-                #print key, hints[key]
+        hints_dict[letter+letter] = ['']
 
     with open('hints.p','w') as f:
-        pickle.dump(hints, f)
+        pickle.dump(hints_dict, f)
 
 def load_hints():
     with open('hints.p','r') as f:
@@ -198,7 +192,7 @@ def swipehint(word):
         letter1= word[i]
         letter2= word[i+1]
         #print word, letter1, letter2
-        shint += HINTS[letter1+letter2]
+        shint += HINTS[letter1+letter2][0]
     #print word, shint
     shint += word[-1]
     return shint
