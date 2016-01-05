@@ -5,9 +5,11 @@ using System.Collections;
 using System;
 using TalesFromTheRift;
 
-public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler {
+public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPointerEnterHandler, IPointerDownHandler, IPointerUpHandler {
 
-    CanvasKeyboard keyboard;
+    public CanvasKeyboard keyboard;
+    private float duration;
+    private bool onKey;
     
     // Use this for initialization
     void Start() {
@@ -18,7 +20,9 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
             keyboard = null;
             Debug.Log("No keyboard"); //should not happen
         }
-
+        duration = 0;
+        onKey = false;
+    
         
     }
     // Update is called once per frame
@@ -28,7 +32,8 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
 
     public void OnDrag(PointerEventData eventData)
     {
-        //Debug.Log("Dragging");
+        if (onKey)
+            duration += Time.deltaTime;
     }
 
 
@@ -39,16 +44,20 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
         if(eventData.dragging && gameObject.name.Length == 1)
         {
             Debug.Log("Entering: " + gameObject.name);
-            AddCharacter();
+            onKey = true;
+            //AddCharacter();
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        onKey = true;
+        /*
         if (gameObject.name.Length == 1) {
             AddCharacter();
             Debug.Log("OnDown: " + gameObject.name);
         }
+        */
         
     }
 
@@ -56,7 +65,8 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
     {
         Debug.Log("DragAdding: " + gameObject.name[0]);
                 
-        keyboard.swyper.AddCharacter(gameObject.name[0]);
+        keyboard.swyper.AddCharacter(gameObject.name[0], duration);
+        duration = 0;
     }
 
     private void DraggingDone()
@@ -69,6 +79,18 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerEnterHandler, IP
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        onKey = false;
+        AddCharacter();
         keyboard.swyper.EndOfInput();
+    }
+
+    public void OnPointerExit(PointerEventData eventData)
+    {
+        if(eventData.dragging && gameObject.CompareTag("Key"))
+            {
+            onKey = false;
+            AddCharacter();
+
+        }
     }
 }

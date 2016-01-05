@@ -23,6 +23,7 @@ public class GuestureController : MonoBehaviour
     FingerModel finger;
     Controller leapController = new Controller();
     private bool fingerdetect;
+    private float duration;
     
     private Vector3 fingerTipPos;
     private const UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
@@ -177,9 +178,15 @@ void Awake()
     {
         if (hit.CompareTag("Key") && hit.name != curChar)
         {
+            if (duration != 0) //don't sent first time
+                swypeController.AddCharacter(curChar[0], duration);//send previous character
+
             curChar = hit.name;
-            swypeController.AddCharacter(curChar[0]);
+            duration = 0;
+            //swypeController.AddCharacter(curChar[0]);
         }
+        if (hit.CompareTag("Key") && hit.name == curChar)
+            duration += Time.deltaTime;       
         if(partOfKeyBoard(hit))
             painter.addPoint(fingerTipPos);
 
