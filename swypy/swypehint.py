@@ -106,7 +106,6 @@ def determine_paths(current, goal):
         for option in get_next_options(current):
             queue.put((option, so_far+[current]))
 
-
     return results
 
 # From letter paths to swipehint string
@@ -245,17 +244,5 @@ def nth_swipehint(word, n):
 
     return hint
 
-
 if __name__ == '__main__':
-    hints = []
-
-    n, opts = n_swipehints_opts('jorisvanvugtax')
-    import random
-    import tqdm
-    print n
-    for x in tqdm.tqdm(range(n)):
-        #rng = random.randint(0,n)
-        hints.append(nth_swipehint('jorisvanvugtax', x))
-
-    print len(hints)
-    print len(set(hints))
+    print "yes yes yes girl"

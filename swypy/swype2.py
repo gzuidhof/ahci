@@ -60,8 +60,6 @@ def init():
 def run_test_cases():
     import time
 
-
-
     test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick
     'wertyuioiuytrtghjklkjhgfd',             # world
