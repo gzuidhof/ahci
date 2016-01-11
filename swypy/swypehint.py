@@ -236,10 +236,26 @@ def n_swipehints_opts(word):
 
 def nth_swipehint(word, n):
     n_opts, between_letter_paths = n_swipehints_opts(word)
-    print n_opts, between_letter_paths
 
+    hint = ''
+    for path in between_letter_paths:
+        nth_element = n % len(path)
+        hint += path[nth_element]
+        n = n / len(path)
+
+    return hint
 
 
 if __name__ == '__main__':
-    #print swipehint('hello')
-    nth_swipehint('aegh', 0)
+    hints = []
+
+    n, opts = n_swipehints_opts('jorisvanvugtax')
+    import random
+    import tqdm
+    print n
+    for x in tqdm.tqdm(range(n)):
+        #rng = random.randint(0,n)
+        hints.append(nth_swipehint('jorisvanvugtax', x))
+
+    print len(hints)
+    print len(set(hints))
