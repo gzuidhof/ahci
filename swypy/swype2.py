@@ -2,11 +2,9 @@
 from operator import itemgetter
 import math
 import swypehint as sh
-import numpy as np
 from multiprocessing import Pool, cpu_count
 from multiprocessing.pool import ThreadPool
 import Levenshtein as lv #python-Levenshtein package
-import matplotlib.pyplot as plt
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
@@ -38,9 +36,8 @@ def score(query_word_hint_tup):
     return edit_distance(query, hint), word
 
 
-def get_suggestions(query, n=5): #charlist,timelist, query, n=5):
+def get_suggestions(query, n=5):
     results = []
-    #get_fitting_words(WORDS,charlist,timelist)
     todo = zip([query]*len(WORDS), WORDS,SWYPE_HINTS)
 
     if MULTIPROCESS:
@@ -52,38 +49,6 @@ def get_suggestions(query, n=5): #charlist,timelist, query, n=5):
     results = sorted(results,key=itemgetter(0))
 
     return results[:n]
-
-def get_fitting_words(words,charlist,timelist): #(wordlist, list of characters from swipe, list of timings )
-    assert (len(charlist) != len(timelist)),"lists are not the same length!"
-    WORDS2 = open('wordlist2.txt').read().split()
-    mean=np.mean(timelist)
-    std=np.std(timelist)
-    char_in_word=[]
-    for i,char in timelist:
-        if char >= mean+ 2* std:
-            char_in_word.append(charlist[i])
-    for word in words:
-        inword=True
-        index=0
-        w=word
-        for x in char_in_word:
-            if x not in w:
-                inword=False
-            else:
-                for j in w:
-                    if w[j]== x:
-                        w=w[j,:]
-                        break
-
-
-
-        if inword:
-         WORDS2.append(word)
-
-    return WORDS2
-
-
-
 
 def init():
     global pool
