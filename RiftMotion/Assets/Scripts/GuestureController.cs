@@ -18,11 +18,13 @@ public class GuestureController : MonoBehaviour
     private RaycastHit hit;
     public Painter painter;
     public Camera camera;
+    public HandModel handModel;
     //List<Vector3> linePoints;
     //LineRenderer lineRenderer;
     FingerModel finger;
     Controller leapController = new Controller();
     private bool fingerdetect;
+    private float duration;
     
     private Vector3 fingerTipPos;
     private const UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
@@ -60,14 +62,15 @@ void Awake()
 
     // Update is called once per frame
     void Update()
-    {        
+    {       
+         
         HandModel[] allGraphicHands = LeapHandController.GetAllGraphicsHands();
 
         if (allGraphicHands.Length <= 0) //no hands present
             return;
 
         HandModel handModel = allGraphicHands[0]; //only 1 hand? Might overthink this (I've got no better idea atm)
-
+        this.handModel = handModel;
 
         GestureUpdate(handModel); //handels gestures (eg for closing keyboard
         PointingUpdate(handModel); //checks if pointing, sends raycasts and draws line
@@ -88,6 +91,8 @@ void Awake()
 
                 if (dir.y == -1 && keyboard.isActiveAndEnabled) // add swype speed
                     keyboard.CloseKeyboard();
+                if (dir.y == 1 && !keyboard.isActiveAndEnabled) // add swype speed
+                    keyboard.OpenKeyboard();
             }
         }
         if (!swipeDetected)
@@ -177,9 +182,15 @@ void Awake()
     {
         if (hit.CompareTag("Key") && hit.name != curChar)
         {
+            if (duration != 0) //don't sent first time
+                swypeController.AddCharacter(curChar[0], duration);//send previous character
+
             curChar = hit.name;
-            swypeController.AddCharacter(curChar[0]);
+            duration = 0;
+            //swypeController.AddCharacter(curChar[0]);
         }
+        if (hit.CompareTag("Key") && hit.name == curChar)
+            duration += Time.deltaTime;       
         if(partOfKeyBoard(hit))
             painter.addPoint(fingerTipPos);
 
@@ -199,9 +210,10 @@ void Awake()
 
     private GameObject fireRaycasts(Vector3 pos)
     {
-        Vector3 dir = (pos - camera.transform.position).normalized * 30;
-        Debug.DrawRay(pos, dir, Color.red, 1, true);
-
+        Vector3 tip=handModel.fingers[1].GetTipPosition();
+        Vector3 dir = tip-Camera.main.transform.position;//(camera.transform.forward);
+        Debug.DrawRay(pos, dir*5f, Color.red, 1, true);
+       
         if (Physics.Raycast(pos, dir, out hit, 1000F))
         {
             // Debug.Log("Collided with: " + hit.collider.gameObject.name);

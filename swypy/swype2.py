@@ -4,8 +4,7 @@ import math
 import swypehint as sh
 from multiprocessing import Pool, cpu_count
 from multiprocessing.pool import ThreadPool
-import pylev
-import Levenshtein as lv
+import Levenshtein as lv #python-Levenshtein package
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
@@ -60,8 +59,6 @@ def init():
 
 def run_test_cases():
     import time
-
-
 
     test_cases = ['hytrerfghjkllo',          # hello
     'qwertyuihgfcvbnjk',                     # quick

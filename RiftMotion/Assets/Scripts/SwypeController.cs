@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq;
 using System.Reflection;
-
+using UnityEngine.EventSystems;
 
 public class SwypeController : MonoBehaviour
 {
@@ -13,7 +13,8 @@ public class SwypeController : MonoBehaviour
     private readonly int nTopSuggestions = 3;
     private string[] topSuggestions;
     public GameObject[] SuggestionFields;
-    public List<string> text;
+    private List<string> text;
+    private List<float> durations;
     public InputField OutputField;
     public InputField InputString;
     private int selectionBegin;
@@ -33,6 +34,10 @@ public class SwypeController : MonoBehaviour
         focusOld = -1;
         topSuggestions = new string[nTopSuggestions];
         isTyping = false;
+        EventSystem.current.SetSelectedGameObject(OutputField.gameObject, null);
+        OutputField.OnPointerClick(new PointerEventData(EventSystem.current));
+        OutputField.caretPosition = 0;
+        durations = new List<float>();
 
 
 
@@ -44,10 +49,12 @@ public class SwypeController : MonoBehaviour
     }
 
 	
-     public void AddCharacter(char character)
+     public void AddCharacter(char character, float duration)
     {
         charList.Add(character);
         InputString.text = new string(charList.ToArray());
+        if (duration > 0)
+            durations.Add(duration);
     }
 
     public void Typing(char character)
@@ -85,7 +92,10 @@ public class SwypeController : MonoBehaviour
 
         if (input.Length > 1)
         {
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);//sent durations
+            for (int i = 0; i < durations.Count; i++)
+                Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
+            durations.Clear();
             suggestions = response.suggestions;
         }
         else if (input.Length == 1)// user types 1 single character
@@ -139,6 +149,7 @@ public class SwypeController : MonoBehaviour
         Debug.Log("Total text: " + output);
 
         OutputField.text = output;
+        OutputField.caretPosition = OutputField.text.Length;
     }
 
     public void setSuggestion(int index)
@@ -154,6 +165,7 @@ public class SwypeController : MonoBehaviour
         {
             int anchor = OutputField.selectionAnchorPosition;
             int focus = OutputField.selectionFocusPosition;
+            
 
             if (anchor != anchorOld || focus != focusOld)
             {

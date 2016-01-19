@@ -6,6 +6,7 @@ import itertools
 import pickle
 import os.path
 import re
+import operator
 
 #Keyboard layout
 LAYOUT = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
@@ -15,6 +16,15 @@ DIAGONAL = True
 
 #Remove diagonal paths when letters are on same row
 STRAIGHT_ROWS = True
+
+#Dynamic programming helper function
+def memoize(f):
+    memo = {}
+    def helper(x):
+        if x not in memo:
+            memo[x] = f(x)
+        return memo[x]
+    return helper
 
 # Check whether coord is within keyboard bounds
 def valid_coord(coord):
@@ -91,11 +101,10 @@ def determine_paths(current, goal):
         if current == goal:
             results.append(so_far)
             shortest_path = len(so_far)
-            break
+            #break
 
         for option in get_next_options(current):
             queue.put((option, so_far+[current]))
-
 
     return results
 
@@ -127,6 +136,17 @@ def swipehint_for_letters(letter1, letter2):
 
     return paths_to_swipehint(letter_paths)
 
+def all_swipehints_for_letters(letter1, letter2):
+    start = letter_to_coord(letter1)
+    goal = letter_to_coord(letter2)
+
+    paths = determine_paths(start,goal)
+    letter_paths = []
+    for path in paths:
+        letters = ''.join([coord_to_letter(coord) for coord in path])
+        letter_paths.append(letters)
+
+    return letter_paths
 
 def calculate_swipehints():
     print "First time swipehint setup"
@@ -136,42 +156,26 @@ def calculate_swipehints():
     letters = 'abcdefghijklmnopqrstuvwxyz'
     letter_combinations = list(itertools.combinations(letters, 2))
 
-    hints = {}
+    hints_dict = {}
 
     #For all unique combinations of letters (where (a,b)==(b,a))
     for i, combo in enumerate(letter_combinations):
         print i+1, '/', len(letter_combinations), combo
         a,b = combo
-        hint = swipehint_for_letters(a,b)
-
-        hints[a+b] = hint
-        hints[b+a] = hint[::-1]
-        print '\t{0} -> {1} = {2}'.format(a,b,hints[a+b])
-        print '\t{0} -> {1} = {2}'.format(b,a,hints[b+a])
+        hints = all_swipehints_for_letters(a,b)
+        hints_reversed = [hint[::-1] for hint in hints]
+        hints_dict[a+b] = hints
+        hints_dict[b+a] = hints_reversed
+        print '\t{0} -> {1} = {2}'.format(a,b,hints_dict[a+b])
+        print '\t{0} -> {1} = {2}'.format(b,a,hints_dict[b+a])
 
     #i.e. path from l to l in hello is empty
     for letter in letters: #Duplicate letters have no swipehint
-        hints[letter+letter] = ''
-
-    if STRAIGHT_ROWS:
-        #Postprocessing, filtering some letters in the paths
-        #If two letters are on the same row of the keyboard, remove letters
-        #from other rows
-        for key, value in hints.iteritems():
-            letter1, letter2 = (key[0],key[1])
-
-            x1,y1 = letter_to_coord(letter1)
-            x2,y2 = letter_to_coord(letter2)
-
-            if y1 == y2:
-                #print key, hints[key]
-                row_letters = LAYOUT[y1]
-                hints[key] = ''.join([letter for letter in value if letter in row_letters])
-
-                #print key, hints[key]
+        hints_dict[letter+letter] = ['']
 
     with open('hints.p','w') as f:
-        pickle.dump(hints, f)
+        pickle.dump(hints_dict, f)
+
 
 def load_hints():
     with open('hints.p','r') as f:
@@ -198,11 +202,47 @@ def swipehint(word):
         letter1= word[i]
         letter2= word[i+1]
         #print word, letter1, letter2
-        shint += HINTS[letter1+letter2]
+        shint += HINTS[letter1+letter2][0]
     #print word, shint
     shint += word[-1]
     return shint
 
 
+
+# Returns tuple: n_paths and between_letter_paths
+# n_paths is the count of possible paths for creating that word (may be huge!)
+# between_letter_paths is a list of lists of paths from one letter to the next
+# for that word. Pick one from each of those lists and you get your path.
+@memoize
+def n_swipehints_opts(word):
+    #Make word alpha (hasn't -> hasnt)
+    word = re.sub("[^a-zA-Z]","", word).lower()
+    between_letter_paths = []
+    for i in xrange(len(word)-1):
+        letter1= word[i]
+        letter2= word[i+1]
+
+        #Add current letter
+        between_letter_paths.append([letter1])
+        between_letter_hint = HINTS[letter1+letter2]
+        if between_letter_hint != ['']:
+            between_letter_paths.append(between_letter_hint)
+
+    between_letter_paths.append([letter2])
+    n_opts = map(len,between_letter_paths)
+    n_paths = reduce(operator.mul, n_opts, 1)
+    return n_paths, between_letter_paths
+
+def nth_swipehint(word, n):
+    n_opts, between_letter_paths = n_swipehints_opts(word)
+
+    hint = ''
+    for path in between_letter_paths:
+        nth_element = n % len(path)
+        hint += path[nth_element]
+        n = n / len(path)
+
+    return hint
+
 if __name__ == '__main__':
-    print swipehint('hello')
+    print "yes yes yes girl"
