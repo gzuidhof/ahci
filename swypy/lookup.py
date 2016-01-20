@@ -1,22 +1,13 @@
-from ast import literal_eval
-
-def getmax(words):
-    best = ('',0)
-    for each in words:
-        if each[1] > best[1]:
-            best = each
-    return best[0]
-
-def getmax2(bigrams):
-    best = ('',0)
-    for each in bigrams:
-        if each[1]>best[1]:
-            best = each
-    return best[0]  
+from ast import literal_eval 
+result1 = []
+result2 = []
 
 def uniget(poss):        
     indices = [(x[0],x[1]) for x in result1 if x[0] in poss]
-    return str(getmax(indices))
+    indices = sorted(indices,key=lambda x:(-x[1],x[0]))
+    result = [x[0] for x in indices]
+    return result
+    #return str(getmax(indices))
 
 def find(poss):
     for each in result1:
@@ -29,7 +20,10 @@ def biget(prev,poss):
     for x in poss:
         if not x in theseguys:
             indices.append(find(x))
-    return str(getmax2(indices))
+    indices = sorted(indices,key=lambda x:(-x[1],x[0]))
+    result = [x[0] for x in indices]
+    return result
+    #return str(getmax2(indices))
 
 def decide(past, poss):
     text = past.split(';')
@@ -39,17 +33,30 @@ def decide(past, poss):
     else:
         return uniget(poss)
 
-result1 = []
-with open('correctedsingles.txt', 'r') as f:
-    for line in f:
-        result1.append(literal_eval(line.strip()))  
+def getbest(past, poss):
+    with open('correctedsingles.txt', 'r') as f:
+        for line in f:
+            result1.append(literal_eval(line.strip()))  
+    with open('correctedbigrams.txt', 'r') as f:
+        for line in f:
+            result2.append(literal_eval(line.strip()))
+    return decide(past,poss)
 
-result2 = []
-with open('correctedbigrams.txt', 'r') as f:
-    for line in f:
-        result2.append(literal_eval(line.strip()))
-
-#print(decide('',['aardvark', 'aback', 'abaft']))
-#print(decide('the',['abalone','abbess','abbe','abbot','aardvark','above']))
+#print(getbest('',['aardvark', 'aback', 'abaft']))
+#print(getbest('the',['abalone','abbess','abbe','abbot','aardvark','above']))
 #'abalone','abbess','abbe','abbot',
-print(decide('',['unapproachable','aardvark']))
+
+# Code below has been omitted but may still be useful later on:
+#def getmax(words):
+#    best = ('',0)
+#    for each in words:
+#        if each[1] > best[1]:
+#            best = each
+#    return best[0]
+#
+#def getmax2(bigrams):
+#    best = ('',0)
+#    for each in bigrams:
+#        if each[1]>best[1]:
+#            best = each
+#    return best[0] 
