@@ -84,7 +84,10 @@ public class SwypeController : MonoBehaviour
 
     public string[] EndOfInput()
     {
-        string input = new string(charList.ToArray());
+        string input = charList_toString();
+        Debug.Log("chars:" + charList_toString());
+        Debug.Log("durations:" + duration_toString());
+        // input = input + "\t" + durations.ToArray() + "\t" + +string.Join(";",text.ToArray());
         charList.Clear();
         
         Debug.Log("input string: " + input);
@@ -92,6 +95,8 @@ public class SwypeController : MonoBehaviour
 
         if (input.Length > 1)
         {
+            input+= "*" + duration_toString() + "*" + string.Join(";", text.ToArray());
+            durations.Clear();
             SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);//sent durations
             for (int i = 0; i < durations.Count; i++)
                 Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
@@ -128,7 +133,26 @@ public class SwypeController : MonoBehaviour
         input = "";
         return topSuggestions; //maak hier later een empty list/array/enumarable van
     }
+    public string duration_toString()
+    {
+        string s="";
+        foreach (float f in durations)
+        {
+            s += f.ToString() + ";";
+        }
+        return s;
 
+    }
+    public string charList_toString()
+    {
+        string s = "";
+        foreach (char c in charList)
+        {
+            s += c + ";";
+        }
+        return s;
+
+    }
     private void SetText(GameObject field, string s)
     {
         if (field != null)

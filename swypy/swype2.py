@@ -3,10 +3,10 @@ from operator import itemgetter
 import math
 import swypehint as sh
 import numpy as np
+import lookup as lu
 from multiprocessing import Pool, cpu_count
 from multiprocessing.pool import ThreadPool
 import Levenshtein as lv #python-Levenshtein package
-import matplotlib.pyplot as plt
 
 WORDS = open('wordlist.txt').read().split()
 SWYPE_HINTS = [sh.swipehint(word) for word in WORDS]
@@ -38,9 +38,13 @@ def score(query_word_hint_tup):
     return edit_distance(query, hint), word
 
 
-def get_suggestions(query, n=5): #charlist,timelist, query, n=5):
+def get_suggestions(charlist,durations,text, n=5): #charlist,timelist, query, n=5):
     results = []
-    #get_fitting_words(WORDS,charlist,timelist)
+    get_fitting_words(charlist,durations)
+    WORDS=open('wordlist2.txt').read().split()
+    
+    query="".join(charlist)
+    #
     todo = zip([query]*len(WORDS), WORDS,SWYPE_HINTS)
 
     if MULTIPROCESS:
@@ -50,37 +54,45 @@ def get_suggestions(query, n=5): #charlist,timelist, query, n=5):
 
     results = filter(None, results)
     results = sorted(results,key=itemgetter(0))
-
     return results[:n]
 
-def get_fitting_words(words,charlist,timelist): #(wordlist, list of characters from swipe, list of timings )
-    assert (len(charlist) != len(timelist)),"lists are not the same length!"
-    WORDS2 = open('wordlist2.txt').read().split()
-    mean=np.mean(timelist)
-    std=np.std(timelist)
+def get_fitting_words(charlist,timelist): #(wordlist, list of characters from swipe, list of timings )
+    assert (len(charlist) == len(timelist)),"lists are not the same length!"
+    WORDS2 = open('wordlist2.txt','w')
+    charlist=charlist[1:]
+    timelist=timelist[1:]
+    durations=[float(x) for x in timelist if not x=='']
+    mean=np.mean(durations)
+    std=np.std(durations)
+    inword=False
     char_in_word=[]
-    for i,char in timelist:
-        if char >= mean+ 2* std:
+    print "durations",durations
+    print "mean", mean
+    print "std", std
+    print ""
+    for i,f in enumerate(durations):
+        if f >= mean + 0.5* std:
             char_in_word.append(charlist[i])
-    for word in words:
+    for word in WORDS:
         inword=True
-        index=0
         w=word
         for x in char_in_word:
             if x not in w:
                 inword=False
             else:
-                for j in w:
-                    if w[j]== x:
-                        w=w[j,:]
+                for i,j in enumerate(w):
+                    if j == x:
+                        w=w[i:]
                         break
 
 
 
         if inword:
-         WORDS2.append(word)
+         WORDS2.write(word+"\n")
+    WORDS2.close
+   
 
-    return WORDS2
+
 
 
 
@@ -111,7 +123,7 @@ def run_test_cases():
     for query, word in zip(test_cases,actual):
         t = time.time()
         print word,query
-        print get_suggestions(query, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
+       # print get_suggestions(query, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
 
 #Use this for benchmarking
 #python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"
