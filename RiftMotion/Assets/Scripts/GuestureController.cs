@@ -180,7 +180,7 @@ void Awake()
 
     private void checkObjectDrag(GameObject hit)
     {
-        if (hit.CompareTag("Key") && hit.name != curChar)
+        if (hit.CompareTag("Key") && hit.name != curChar) 
         {
             if (duration != 0) //don't sent first time
                 swypeController.AddCharacter(curChar[0], duration);//send previous character
