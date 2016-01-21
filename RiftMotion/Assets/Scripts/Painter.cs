@@ -17,7 +17,7 @@ public class Painter : MonoBehaviour {
         lineRenderer.SetVertexCount(0);
         lineRenderer.SetWidth(0.1f, 0.1f);
         lineRenderer.SetColors(Color.red, Color.red);
-        lineRenderer.useWorldSpace = true;
+        lineRenderer.useWorldSpace = false;
         linePoints = new List<Vector3>();
     }
 	

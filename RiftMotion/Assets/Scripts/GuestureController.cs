@@ -192,7 +192,7 @@ void Awake()
         if (hit.CompareTag("Key") && hit.name == curChar)
             duration += Time.deltaTime;       
         if(partOfKeyBoard(hit))
-            painter.addPoint(fingerTipPos);
+            painter.addPoint(gameObject.transform.InverseTransformPoint(fingerTipPos));
 
     }
 
