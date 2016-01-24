@@ -98,16 +98,26 @@ public class SwypeController : MonoBehaviour
         string input = new string(charList.ToArray());
         charList.Clear();
         
-        Debug.Log("input string: " + input);
+        Debug.Log("input string: ");
         string[] suggestions = new string[0];
 
         if (input.Length > 1)
         {
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);//sent durations
+            bool allCaps = input.All(c => char.IsUpper(c));
+            
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
             for (int i = 0; i < durations.Count; i++)
+            {
                 Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
+            }
             durations.Clear();
-            suggestions = response.suggestions;
+
+            if(allCaps) //make lowercase response uppercase again
+            {
+                suggestions = response.suggestions.ToList().ConvertAll(s => s.ToUpper()).ToArray();
+            }
+            else 
+                suggestions = response.suggestions;
         }
         else if (input.Length == 1)// user types 1 single character
         {

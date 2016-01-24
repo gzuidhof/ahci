@@ -141,8 +141,12 @@ void Awake()
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerUpHandler);
             if (fingerdetect)
             {
-                if(keyboard.isActiveAndEnabled) //Otherwise causes nullpointer exeptions
+                if (keyboard.isActiveAndEnabled && curChar.Length > 0) //Otherwise causes nullpointer exeptions
+                {
+                    swypeController.AddCharacter(curChar[0], duration);
                     swypeController.EndOfInput();
+
+                }
                 painter.removeLine();
                 duration = 0;
                 curChar = "";
