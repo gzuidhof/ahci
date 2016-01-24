@@ -11,7 +11,6 @@ import os.path
 from itertools import izip
 from tqdm import tqdm
 
-
 WORDS = open('wordlist.txt').read().split()
 WORDS = sorted(WORDS)
 N_HINTS = [sh.n_swipehints_opts(word)[0] for word in WORDS]
@@ -20,10 +19,7 @@ SWYPE_HINTS = []
 N_FRACTIONS = 50
 FRACTIONS = np.linspace(0,1,N_FRACTIONS)
 
-
 swype_hints_filepath="word_paths_{0}.p".format(N_FRACTIONS)
-
-
 
 if os.path.isfile(swype_hints_filepath):
     with open(swype_hints_filepath, 'rb') as f:
@@ -69,14 +65,10 @@ def get_suggestions(query, n=5):
     word_todo = WORDS
     score_avg = np.zeros(10)
     score_min = np.ones(10) * 99999
-
     hints = SWYPE_HINTS
 
     for i in xrange(len(FRACTIONS)):
-        #print i
-        #t = time.time()
         results = [score(query, word, hint, i) for word, hint in izip(word_todo, hints)]
-        #print i, "{:5.1f}ms".format((time.time()-t)*1000)
 
         if len(results) != 10:
             results = sorted(results,key=itemgetter(0))
@@ -89,7 +81,7 @@ def get_suggestions(query, n=5):
         score_min = np.minimum(score_min,scores)
 
     score_avg = score_avg / len(FRACTIONS) #Actual average now
-    #scores = score_min
+
     scores = (0.8*score_min)+(0.2*score_avg)
     scores = map(int, scores)
     results = zip(scores, word_todo)
