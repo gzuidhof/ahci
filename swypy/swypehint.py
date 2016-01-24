@@ -233,7 +233,9 @@ def n_swipehints_opts(word):
     n_paths = reduce(operator.mul, n_opts, 1)
     return n_paths, between_letter_paths
 
-def nth_swipehint(word, n):
+@memoize
+def nth_swipehint(word_n_tuple):
+    word, n = word_n_tuple
     n_opts, between_letter_paths = n_swipehints_opts(word)
 
     hint = ''
@@ -245,4 +247,14 @@ def nth_swipehint(word, n):
     return hint
 
 if __name__ == '__main__':
-    print "yes yes yes girl"
+    hints = []
+    n, opts = n_swipehints_opts('halloasdfa')
+
+    print nth_swipehint(('halloasdfa', 0))
+    print nth_swipehint(('halloasdfa', n-1))
+    import tqdm
+    for x in tqdm.tqdm(range(n)):
+        hints.append(nth_swipehint(('halloasdfa', x)))
+
+    print len(hints)
+    print len(set(hints))
