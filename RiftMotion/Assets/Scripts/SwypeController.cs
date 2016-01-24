@@ -29,7 +29,7 @@ public class SwypeController : MonoBehaviour
 	void Start () {
         charList = new List<char>();
         text = new List<string>();
-        SuggestionFields = GameObject.FindGameObjectsWithTag("SuggestionField");
+        SuggestionFields = FindSuggestionFields();
         anchorOld = -1;
         focusOld = -1;
         topSuggestions = new string[nTopSuggestions];
@@ -38,6 +38,12 @@ public class SwypeController : MonoBehaviour
         OutputField.OnPointerClick(new PointerEventData(EventSystem.current));
         OutputField.caretPosition = 0;
         durations = new List<float>();
+    }
+
+    private GameObject[] FindSuggestionFields()
+    {
+        List<GameObject> fields = GameObject.FindGameObjectsWithTag("SuggestionField").ToList();
+        return fields.OrderBy(go => go.name).ToArray<GameObject>();
     }
 
     public void Update()
@@ -52,6 +58,14 @@ public class SwypeController : MonoBehaviour
         InputString.text = new string(charList.ToArray());
         if (duration > 0)
             durations.Add(duration);
+    }
+
+    public void clearChars()
+    {
+        if (charList.Count != 0) //sometimes happens with backspace
+            EndOfInput();
+        else
+            charList.Clear();
     }
 
     public void Typing(char character)
@@ -203,5 +217,11 @@ public class SwypeController : MonoBehaviour
         //Debug.Log("Selected position : " + selectPos);
     }
 
+    public void backspace()
+    {
+        string lastWord = text[text.Count - 1];
+        text[text.Count - 1] = lastWord.Remove(lastWord.Length - 1);//remove last character        
+        WriteText();
+    }
 
 }

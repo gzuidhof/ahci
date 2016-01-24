@@ -13,6 +13,7 @@ public class GuestureController : MonoBehaviour
     public HandController LeapHandController;
     public SwypeController swypeController;
     public CanvasKeyboard keyboard;
+    public CanvasKeyboardASCII ascii;
     private bool swiping;
     private String curChar;
     private RaycastHit hit;
@@ -129,8 +130,11 @@ void Awake()
     {
         if (IsPointing(handModel))
         {
+            if(!fingerdetect) //first time, solves some backspace problems
+                swypeController.clearChars();
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerDownHandler);Hoe we een event willen executen
             fingerdetect = true;
+            
         }
         else
         {
@@ -140,9 +144,12 @@ void Awake()
                 if(keyboard.isActiveAndEnabled) //Otherwise causes nullpointer exeptions
                     swypeController.EndOfInput();
                 painter.removeLine();
+                duration = 0;
+                curChar = "";
+                fingerdetect = false;
             }
 
-            fingerdetect = false;
+            
         }
 
         if (fingerdetect && keyboard.isActiveAndEnabled)
@@ -170,20 +177,28 @@ void Awake()
             
         }
 
-        
+        else if(tapped.CompareTag("Shift"))
+        {
+            ascii.OnKeyDown(tapped);
+        }
+        else if(tapped.CompareTag("Back"))
+        {
+            swypeController.backspace();
+        }
+
         //tapped one of the suggestions
-        if (tapped.CompareTag("SuggestionField"))
+        else if (tapped.CompareTag("SuggestionField"))
         {
             swypeController.setSuggestion(int.Parse(tapped.name[tapped.name.Length - 1].ToString()));
         }
         // typed single character
-        if (tapped.CompareTag("Key") && tapped.name != curChar)
+        else if (tapped.CompareTag("Key") && tapped.name != curChar)
         {
             curChar = tapped.name;
             swypeController.Typing(curChar[0]);
         }
         //typed the space
-        if(tapped.CompareTag("Space"))
+        else if(tapped.CompareTag("Space"))
         {
             swypeController.Typing(' ');
         }
