@@ -22,5 +22,4 @@ def get_tasks():
         return jsonify({'error':'No query argument given!', 'suggestions':[],query:None})
 
 if __name__ == '__main__':
-    swype.init()
     app.run(debug=True)
