@@ -104,9 +104,9 @@ void Awake()
         if (g.Type == Gesture.GestureType.TYPE_SCREEN_TAP || g.Type == Gesture.GestureType.TYPE_KEY_TAP) //Actually never sees the screen tap, need to check this out
         {
 
-            GameObject tapped = fireRaycasts(hand.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition());
-            if (tapped != null)
-                checkObjectTap(tapped);
+            RaycastHit tappedHit = fireRaycasts(hand.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition());
+            if (tappedHit.collider != null)
+                checkObjectTap(tappedHit);
 
         }
     }
@@ -148,29 +148,42 @@ void Awake()
         if (fingerdetect && keyboard.isActiveAndEnabled)
         {
             fingerTipPos = handModel.fingers[(int)Finger.FingerType.TYPE_INDEX].GetTipPosition();
-            GameObject hit = fireRaycasts(fingerTipPos);
-            if (hit != null)
-                checkObjectDrag(hit);
+            RaycastHit hit = fireRaycasts(fingerTipPos);
+            if (hit.collider != null)
+                checkObjectDrag(hit.collider.gameObject);
             
         }
     }
 
-    private void checkObjectTap(GameObject tapped)
+    private void checkObjectTap(RaycastHit tappedHit)
     {
-        if (tapped.CompareTag("TextOutput") && !keyboard.isActiveAndEnabled)
-            keyboard.OpenKeyboard();
+        GameObject tapped = tappedHit.collider.gameObject;
 
+        
+        if (tapped.CompareTag("TextOutput"))
+        {
+            //open keyboard
+            if (!keyboard.isActiveAndEnabled)
+                keyboard.OpenKeyboard();
+            else
+                swypeController.SelectText(tappedHit.point);//(tapped.transform.InverseTransformPoint(tappedHit.point));
+            
+        }
 
+        
+        //tapped one of the suggestions
         if (tapped.CompareTag("SuggestionField"))
         {
             swypeController.setSuggestion(int.Parse(tapped.name[tapped.name.Length - 1].ToString()));
         }
-        else if (tapped.CompareTag("Key") && tapped.name != curChar)
+        // typed single character
+        if (tapped.CompareTag("Key") && tapped.name != curChar)
         {
             curChar = tapped.name;
             swypeController.Typing(curChar[0]);
         }
-        else if(tapped.CompareTag("Space"))
+        //typed the space
+        if(tapped.CompareTag("Space"))
         {
             swypeController.Typing(' ');
         }
@@ -208,19 +221,18 @@ void Awake()
     }
 
 
-    private GameObject fireRaycasts(Vector3 pos)
+    private RaycastHit fireRaycasts(Vector3 pos)
     {
         Vector3 tip=handModel.fingers[1].GetTipPosition();
         Vector3 dir = tip-Camera.main.transform.position;//(camera.transform.forward);
         Debug.DrawRay(pos, dir*5f, Color.red, 1, true);
-       
+        RaycastHit hit;
         if (Physics.Raycast(pos, dir, out hit, 1000F))
         {
-            // Debug.Log("Collided with: " + hit.collider.gameObject.name);
-            return hit.collider.gameObject;
+            // Debug.Log("Collided with: " + hit.collider.gameObject.name
+            return hit;
         }
-        else
-            return null;
+        return hit;
     }
     /// <summary>
     /// Returns list of booleans for each finger that is extending.

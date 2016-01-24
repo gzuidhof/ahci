@@ -38,9 +38,6 @@ public class SwypeController : MonoBehaviour
         OutputField.OnPointerClick(new PointerEventData(EventSystem.current));
         OutputField.caretPosition = 0;
         durations = new List<float>();
-
-
-
     }
 
     public void Update()
@@ -193,5 +190,18 @@ public class SwypeController : MonoBehaviour
         }                 
         
     }
+
+    //Unused
+    public void SelectText(Vector3 pos)
+    {
+        Debug.Log("Postion: " + pos.ToString());
+        float width = OutputField.GetComponent<RectTransform>().rect.width;
+        float height = OutputField.GetComponent<RectTransform>().rect.height;
+        //Debug.Log("Rect pos: " + OutputField.GetComponent<RectTransform>().transform.InverseTransformPoint(pos));
+        //Debug.Log("width: " + width + " height:  " + height);
+        Vector2 selectPos = new Vector2(pos.x + width / 2, pos.y + height / 2);
+        //Debug.Log("Selected position : " + selectPos);
+    }
+
 
 }
