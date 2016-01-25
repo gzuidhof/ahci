@@ -19,7 +19,7 @@ def get_tasks():
         text=text.split(";")
         print "QUERY2!", query
         t = time.time()
-        suggestions = swype.get_suggestions(charlist,durations,text)
+        suggestions = swype.get_suggestions("".join(charlist),durations,text)
         suggestions = zip(*suggestions)[1] if len(suggestions) > 0 else []
         print "Elapsed time getting suggestions {:5.1f}ms".format((time.time()-t)*1000)
         return jsonify({'query':query, 'suggestions':suggestions, 'error':'None'})
@@ -27,5 +27,4 @@ def get_tasks():
         return jsonify({'error':'No query argument given!', 'suggestions':[],query:None})
 
 if __name__ == '__main__':
-    swype.init()
     app.run(debug=True)
