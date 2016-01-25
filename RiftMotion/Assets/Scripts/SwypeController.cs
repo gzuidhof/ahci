@@ -178,18 +178,30 @@ public class SwypeController : MonoBehaviour
 
     public void setSuggestion(int index)
     {
+        if(SuggestionFields[index].GetComponentInChildren<Text>().text != "")
+        {
+            string[] words = getWords();
+            string LastWord = words[words.Length - 2];//last space also included
+            foreach (string s in words)
+                Debug.Log("Word:" + s + ";");
+            Debug.Log(text.Count - 1 - LastWord.Length + " " + LastWord.Length);
+            text.RemoveRange(text.Count - 1 - LastWord.Length, LastWord.Length + 1); //remove some extra cause of " " spacing
+            text.AddRange((topSuggestions[index]).ToCharArray());
+            Debug.Log("Suggestion:" + topSuggestions[index] + ";");
 
-        string[] words = getWords();
-        string LastWord = words[words.Length - 2];//last space also included
-        foreach(string s in words)
-            Debug.Log("Word:" + s+";");
-        Debug.Log(text.Count-1 - LastWord.Length + " " + LastWord.Length);
-        text.RemoveRange(text.Count-1 - LastWord.Length, LastWord.Length+1); //remove some extra cause of " " spacing
-        text.AddRange((topSuggestions[index]).ToCharArray());
-        Debug.Log("Suggestion:" + topSuggestions[index] + ";");
-            
-        WriteText();
+            WriteText();
+        }
+
     }
+
+    private void clearSuggestions()
+    {
+        foreach(GameObject field in SuggestionFields)
+        {
+            SetText(field, "");
+        }
+    }
+
 
     public string[] getWords()
     {
@@ -247,12 +259,9 @@ public class SwypeController : MonoBehaviour
 
     public void backspace()
     {
-        /*
         text.RemoveAt(text.Count - 1);
-        string lastWord = text[text.Count - 1];
-        text[text.Count - 1] = lastWord.Remove(lastWord.Length - 1);//remove last character        
+        clearSuggestions();
         WriteText();
-        */
     }
 
 }
