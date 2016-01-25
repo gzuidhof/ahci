@@ -82,10 +82,10 @@ def get_suggestions(query, durations, text, n=5):
     score_avg = score_avg / len(FRACTIONS) #Actual average now
 
     scores = (0.8*score_min)+(0.2*score_avg)
-    scores = map(int, scores)
     results = zip(scores, word_todo)
     results = sorted(results, key=itemgetter(0))
 
+    results = [(int(x), y) for (x, y) in results]
     return results[:n]
 
 def run_test_cases():
@@ -98,15 +98,16 @@ def run_test_cases():
     'asdfgrtyuijhvcvghuiklkjuytyuytre',      # agriculture
     'mjuytfdsdfghuijnbvc',                   # music
     'vghjioiuhgvcxsasdvbhuiklkjhgfdsaserty', # vocabulary
+    'tredfgbnbgfds'
     ]
 
     actual = ['hello','quick','world','doctor','architecture',
-        'agriculture','music','vocabulary']
+        'agriculture','music','vocabulary', 'trends']
 
     for query, word in zip(test_cases,actual):
         t = time.time()
         print word,query
-        print get_suggestions(query, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
+        print get_suggestions(query, 0, 0, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
 
 #Use this for benchmarking
 #python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"
