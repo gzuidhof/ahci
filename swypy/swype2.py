@@ -93,12 +93,12 @@ def get_suggestions(query, durations, text, n=5):
     return results
 
 
-def same_distance(results, index):
+def same_distance(results, index, prev = "the"):
     if index == 0:
         return results
         
     if (results[index][0] == results[index-1][0]):
-        results[index-1:index+1] = lu.decide(results[index-1:index+1])
+        results[index-1:index+1] = lu.decide(results[index-1:index+1], prev)
 
     return same_distance(results, index-1)
     
