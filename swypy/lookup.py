@@ -1,9 +1,18 @@
+from __future__ import division
+from ast import literal_eval as le
+import time
 ngrams = {}
 
-with open('correctedsingles.txt', 'r') as f:
-        for line in f:
-            print line
+start = time.time()
 
+print "Loading ngrams..."
+
+with open('correctedsingles.txt', 'r') as f: #takes about half a second
+	for line in f:
+		tup = le(line)
+		ngrams[tup[0]] = tup[1]
+	
+print "Loading done, elpsed time: " + str(time.time()-start)
 
 def uniget(poss,result1):        
     indices = [(x[0],x[1]) for x in result1 if x[0] in poss]
