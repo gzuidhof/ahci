@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 import swype2 as swype
 import time
+from ast import literal_eval 
 
 
 app = Flask(__name__)
@@ -18,18 +19,18 @@ def get_tasks():
             result1.append(literal_eval(line.strip()))  
     with open('correctedbigrams.txt', 'r') as f:
         for line in f:
-            result2.append(literal_eval(line.strip()))
+            result2.append(literal_eval(line.strip()))    
     
     if query is not None and len(query) > 0:
         query = str(query)
-        #(charlist,durations,text)=query.split("*")
-        #durations=durations.split(";")
-        #charlist=charlist.split(";")
-        #text=text.split(";")
-        print "QUERY2!", query
+#        (charlist,durations,text)=query.split("*")
+#        durations=durations.split(";")
+#        charlist=charlist.split(";")
+#        text=text.split(";")
+#        print "QUERY2!", query
         t = time.time()
-        suggestions = swype.get_suggestions(query, 0, 0,result1,result2)
-        #suggestions = swype.get_suggestions("".join(charlist),durations,text) 
+        suggestions = swype.get_suggestions(query, 0, "",result1,result2)
+        #suggestions = swype.get_suggestions("".join(charlist),durations,text,result1,result2) 
         suggestions = zip(*suggestions)[1] if len(suggestions) > 0 else []
         print "Elapsed time getting suggestions {:5.1f}ms".format((time.time()-t)*1000)
         return jsonify({'query':query, 'suggestions':suggestions, 'error':'None'})

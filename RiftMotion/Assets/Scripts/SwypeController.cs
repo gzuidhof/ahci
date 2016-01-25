@@ -105,6 +105,9 @@ public class SwypeController : MonoBehaviour
         {
             bool allCaps = input.All(c => char.IsUpper(c));
             
+			input+= "*" + duration_toString() + "*" + string.Join(";", text.ToArray());
+			durations.Clear()
+			
             SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
             for (int i = 0; i < durations.Count; i++)
             {
