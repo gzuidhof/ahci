@@ -104,8 +104,17 @@ public class SwypeController : MonoBehaviour
         if (input.Length > 1)
         {
             bool allCaps = input.All(c => char.IsUpper(c));
-            
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
+            string[] words = getWords();
+            string lastWord = "";
+
+            if (words.Length > 1)//words always containts an empty string for some reason
+            {
+                lastWord = words[words.Length - 2];
+            }
+			input+= "*" + FloatToString(durations) + "*" +  lastWord; //character string + durations + last word
+            durations.Clear();
+			
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//send durations
             for (int i = 0; i < durations.Count; i++)
             {
                 //Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
@@ -158,18 +167,6 @@ public class SwypeController : MonoBehaviour
 
     private void WriteText()
     {
-        /*
-        string output = "";
-        foreach(string s in text)
-        {
-            Debug.Log(s);
-            if (s.Length > 1)
-                output += s + " ";
-            else
-                output += s;
-        }
-        Debug.Log("Total text: " + output);
-        */
         string output = new string(text.ToArray());
 
         OutputField.text = output;
@@ -235,10 +232,6 @@ public class SwypeController : MonoBehaviour
 
                 anchorOld = anchor;
                 focusOld = focus;
-
-                Debug.Log("Selctionbegin: " + selectionBegin + " SelectionEnd: " + selectionEnd);
-                Debug.Log("Anchor: " + OutputField.selectionAnchorPosition + " Focus: " + OutputField.selectionFocusPosition);
-                Debug.Log("Selected: " + new string(OutputField.text.Skip(selectionBegin).Take(selectionEnd - selectionBegin).ToArray()));
             }
 
         }                 
@@ -263,5 +256,17 @@ public class SwypeController : MonoBehaviour
         clearSuggestions();
         WriteText();
     }
+
+    private string FloatToString(List<float> floats)
+    {
+        string s = "";
+        foreach (float f in floats)
+        {
+            s += f.ToString() + ";";
+        }
+        return s;
+
+    }
+
 
 }

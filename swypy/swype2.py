@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 from __future__ import division
 from operator import itemgetter
 import math
@@ -8,6 +7,7 @@ import numpy as np
 import time
 import cPickle as pickle
 import os.path
+import lookup as lu
 from itertools import izip
 from tqdm import tqdm
 
@@ -60,7 +60,7 @@ def score(query, word, hints,i):
 
     return edit_distance(query, hints[i]), word, hints
 
-def get_suggestions(query, n=5):
+def get_suggestions(query, durations, text, n=5):
 
     word_todo = WORDS
     score_avg = np.zeros(10)
@@ -83,12 +83,28 @@ def get_suggestions(query, n=5):
     score_avg = score_avg / len(FRACTIONS) #Actual average now
 
     scores = (0.8*score_min)+(0.2*score_avg)
-    scores = map(int, scores)
     results = zip(scores, word_todo)
     results = sorted(results, key=itemgetter(0))
 
-    return results[:n]
+    results = [(int(x), y) for (x, y) in results]
 
+    results = same_distance(results, n)
+    
+    return results
+
+
+def same_distance(results, index, prev = "the"):
+    if index == 0:
+        return results
+        
+    if (results[index][0] == results[index-1][0]):
+        results[index-1:index+1] = lu.decide(results[index-1:index+1], prev)
+
+    return same_distance(results, index-1)
+    
+        
+
+    
 def run_test_cases():
 
     test_cases = ['hytrerfghjkllo',          # hello
@@ -99,15 +115,16 @@ def run_test_cases():
     'asdfgrtyuijhvcvghuiklkjuytyuytre',      # agriculture
     'mjuytfdsdfghuijnbvc',                   # music
     'vghjioiuhgvcxsasdvbhuiklkjhgfdsaserty', # vocabulary
+    'tredfgbnbgfds'
     ]
 
     actual = ['hello','quick','world','doctor','architecture',
-        'agriculture','music','vocabulary']
+        'agriculture','music','vocabulary', 'trends']
 
     for query, word in zip(test_cases,actual):
         t = time.time()
         print word,query
-        print get_suggestions(query, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
+        print get_suggestions(query, 0, 0, 5), "{:5.1f}ms".format((time.time()-t)*1000), '\n'
 
 #Use this for benchmarking
 #python -m timeit -s "import swype2; swype2.init()" "swype2.run_test_cases()"

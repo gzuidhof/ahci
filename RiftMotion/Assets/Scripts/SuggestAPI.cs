@@ -43,13 +43,12 @@ public class SuggestAPI : MonoBehaviour {
 
         WWW www = instance.GET(url);
         var jsonResponse = JSON.Parse(www.text);
-
-        var suggestionsN = jsonResponse["suggestions"].Count;
+        var suggestionsN = jsonResponse["suggestions"][1].Count;
         string[] suggestions = new string[suggestionsN];
 
         for (int i = 0; i < suggestionsN; i++)
         {
-            suggestions[i] = jsonResponse["suggestions"].AsArray[i];
+            suggestions[i] = jsonResponse["suggestions"][1].AsArray[i];
         }
 
         SuggestAPIResponse response = new SuggestAPIResponse(jsonResponse["query"], suggestions, jsonResponse["error"]);

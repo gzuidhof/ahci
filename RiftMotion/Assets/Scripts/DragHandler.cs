@@ -90,7 +90,6 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
             {
             onKey = false;
             AddCharacter();
-
         }
     }
 }
