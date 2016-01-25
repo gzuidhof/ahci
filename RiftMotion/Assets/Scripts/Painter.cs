@@ -15,8 +15,8 @@ public class Painter : MonoBehaviour {
         lineRenderer = gameObject.AddComponent<LineRenderer>();
         lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
         lineRenderer.SetVertexCount(0);
-        lineRenderer.SetWidth(0.1f, 0.1f);
-        lineRenderer.SetColors(Color.red, Color.red);
+        lineRenderer.SetWidth(0.05f, 0.05f);
+        lineRenderer.SetColors(Color.magenta, Color.green);
         lineRenderer.useWorldSpace = false;
         linePoints = new List<Vector3>();
     }

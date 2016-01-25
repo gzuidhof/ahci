@@ -26,7 +26,7 @@ public class GuestureController : MonoBehaviour
     Controller leapController = new Controller();
     private bool fingerdetect;
     private float duration;
-    
+
     private Vector3 fingerTipPos;
     private const UInt32 MOUSEEVENTF_LEFTDOWN = 0x0002;
     private const UInt32 MOUSEEVENTF_LEFTUP = 0x0004;
@@ -126,18 +126,38 @@ void Awake()
            
     }
 
+    private float timeNotPointing = 0f;
+
     private void PointingUpdate(HandModel handModel)
     {
+
+        bool keepDrawing = false;
+
         if (IsPointing(handModel))
+        {
+            keepDrawing = true;
+            timeNotPointing = 0f;
+        }
+        else
+        {
+            timeNotPointing += Time.deltaTime;
+        }
+
+        if (timeNotPointing < 0.36f){
+            keepDrawing = true;
+        }
+
+
+        if (keepDrawing)
         {
             if(!fingerdetect) //first time, solves some backspace problems
                 swypeController.clearChars();
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerDownHandler);Hoe we een event willen executen
-            fingerdetect = true;
-            
+            fingerdetect = true;            
         }
         else
         {
+
             //ExecuteEvents.Execute(button.gameObject, pointer, ExecuteEvents.pointerUpHandler);
             if (fingerdetect)
             {
@@ -243,7 +263,7 @@ void Awake()
     private RaycastHit fireRaycasts(Vector3 pos)
     {
         Vector3 tip=handModel.fingers[1].GetTipPosition();
-        Vector3 dir = tip-Camera.main.transform.position;//(camera.transform.forward);
+        Vector3 dir = tip-camera.transform.position;//(camera.transform.forward);
         Debug.DrawRay(pos, dir*5f, Color.red, 1, true);
         RaycastHit hit;
         if (Physics.Raycast(pos, dir, out hit, 1000F))

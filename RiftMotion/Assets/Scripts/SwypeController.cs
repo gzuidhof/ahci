@@ -108,7 +108,7 @@ public class SwypeController : MonoBehaviour
             SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
             for (int i = 0; i < durations.Count; i++)
             {
-                Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
+                //Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
             }
             durations.Clear();
 
