@@ -104,9 +104,15 @@ public class SwypeController : MonoBehaviour
         if (input.Length > 1)
         {
             bool allCaps = input.All(c => char.IsUpper(c));
-            
-			input+= "*" + duration_toString() + "*" + string.Join(";", text.ToArray());
-			durations.Clear()
+            string[] words = getWords();
+            string lastWord = "";
+            Debug.Log(words.Length+ "Content" + words[0] +  ";");
+            if (words.Length > 1)//words always containts a empty string for some reason
+            {
+                lastWord = words[words.Length - 2];
+            }
+			input+= "*" + FloatToString(durations) + "*" +  lastWord; //character string + durations + last word
+            durations.Clear();
 			
             SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
             for (int i = 0; i < durations.Count; i++)
@@ -266,5 +272,17 @@ public class SwypeController : MonoBehaviour
         clearSuggestions();
         WriteText();
     }
+
+    private string FloatToString(List<float> floats)
+    {
+        string s = "";
+        foreach (float f in floats)
+        {
+            s += f.ToString() + ";";
+        }
+        return s;
+
+    }
+
 
 }

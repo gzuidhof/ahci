@@ -1,3 +1,10 @@
+ngrams = {}
+
+with open('correctedsingles.txt', 'r') as f:
+        for line in f:
+            print line
+
+
 def uniget(poss,result1):        
     indices = [(x[0],x[1]) for x in result1 if x[0] in poss]
     indices = sorted(indices,key=lambda x:(-x[1],x[0]))
@@ -24,7 +31,7 @@ def decide(prev, poss, result1, result2):
         if prev in [thisone[1] for thisone in result2]:
             return biget(prev,poss,result1,result2)
     else:
-        return uniget(poss)
+        return uniget(poss,result1)
 
 #print(getbest('',['aardvark', 'aback', 'abaft']))
 #print(getbest('the',['abalone','abbess','abbe','abbot','aardvark','above']))
