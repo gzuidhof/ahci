@@ -61,11 +61,13 @@ def score(query, word, hints,i):
 
 def get_suggestions(query, durations, text, n=5):
 
-    word_todo = WORDS
+    #word_todo = WORDS
     score_avg = np.zeros(10)
     score_min = np.ones(10) * 99999
     hints = SWYPE_HINTS
-
+    get_fitting_words(query,durations)
+    WORDS = open('wordlist2.txt').read().split()
+    word_todo = sorted(WORDS)
     for i in xrange(len(FRACTIONS)):
         results = [score(query, word, hint, i) for word, hint in izip(word_todo, hints)]
 
@@ -87,6 +89,35 @@ def get_suggestions(query, durations, text, n=5):
 
     results = [(int(x), y) for (x, y) in results]
     return results[:n]
+
+def get_fitting_words(charlist,timelist): #(wordlist, list of characters from swipe, list of timings )
+    assert (len(charlist) == len(timelist)),"lists are not the same length!"
+    WORDS2 = open('wordlist2.txt','w')
+    durations=[float(x) for x in timelist if not x=='']
+    mean=np.mean(durations) #possibly not actual avarage/std but works ;).
+    std=np.std(durations)
+    char_in_word=[]
+    inword=False
+    for i,f in enumerate(durations):
+        if f >= mean + 0.5* std:
+            char_in_word.append(charlist[i])
+    for word in WORDS:
+        inword=True
+        w=word
+        for x in char_in_word:
+            if x not in w:
+                inword=False
+            else:
+                for i,j in enumerate(w):
+                    if j == x:
+                        w=w[i:]
+                        break
+
+
+
+        if inword:
+         WORDS2.write(word+"\n")
+    WORDS2.close
 
 def run_test_cases():
 

@@ -93,6 +93,16 @@ public class SwypeController : MonoBehaviour
         
     }
 
+    public string duration_toString()
+    {
+        string s = "";
+        foreach (float f in durations)
+        {
+            s += f.ToString() + ";";
+        }
+        return s;
+    }
+
     public string[] EndOfInput()
     {
         string input = new string(charList.ToArray());
@@ -104,15 +114,11 @@ public class SwypeController : MonoBehaviour
         if (input.Length > 1)
         {
             bool allCaps = input.All(c => char.IsUpper(c));
-            
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
-            for (int i = 0; i < durations.Count; i++)
-            {
-                Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
-            }
+            input += "*" + duration_toString() + "*" + "";//new string(text.ToArray());
             durations.Clear();
-
-            if(allCaps) //make lowercase response uppercase again
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
+          
+            if (allCaps) //make lowercase response uppercase again
             {
                 suggestions = response.suggestions.ToList().ConvertAll(s => s.ToUpper()).ToArray();
             }
@@ -121,6 +127,7 @@ public class SwypeController : MonoBehaviour
         }
         else if (input.Length == 1)// user types 1 single character
         {
+            durations.Clear();
             text.Add(input[0]);
             WriteText();
             return topSuggestions;

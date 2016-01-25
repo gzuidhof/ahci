@@ -13,14 +13,13 @@ def get_tasks():
     
     if query is not None and len(query) > 0:
         query = str(query)
-        #(charlist,durations,text)=query.split("*")
-        #durations=durations.split(";")
-        #charlist=charlist.split(";")
-        #text=text.split(";")
+        (query,durations,text)=query.split("*")
+        durations=durations.split(";")
+        del durations[-1]#removes last empty element
         print "QUERY2!", query
         t = time.time()
-        suggestions = swype.get_suggestions(query, 0, 0)
-        #suggestions = swype.get_suggestions("".join(charlist),durations,text) 
+        #suggestions = swype.get_suggestions(query, 0, 0)
+        suggestions = swype.get_suggestions("".join(query),durations,text)
         suggestions = zip(*suggestions)[1] if len(suggestions) > 0 else []
         print "Elapsed time getting suggestions {:5.1f}ms".format((time.time()-t)*1000)
         return jsonify({'query':query, 'suggestions':suggestions, 'error':'None'})
