@@ -43,9 +43,7 @@ public class SuggestAPI : MonoBehaviour {
 
         WWW www = instance.GET(url);
         var jsonResponse = JSON.Parse(www.text);
-        Debug.Log(jsonResponse.ToString());
         var suggestionsN = jsonResponse["suggestions"][1].Count;
-        Debug.Log(suggestionsN);
         string[] suggestions = new string[suggestionsN];
 
         for (int i = 0; i < suggestionsN; i++)

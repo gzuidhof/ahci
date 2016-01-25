@@ -106,7 +106,7 @@ public class SwypeController : MonoBehaviour
             bool allCaps = input.All(c => char.IsUpper(c));
             string[] words = getWords();
             string lastWord = "";
-            Debug.Log(words.Length+ "Content" + words[0] +  ";");
+
             if (words.Length > 1)//words always containts an empty string for some reason
             {
                 lastWord = words[words.Length - 2];
@@ -232,10 +232,6 @@ public class SwypeController : MonoBehaviour
 
                 anchorOld = anchor;
                 focusOld = focus;
-
-                Debug.Log("Selctionbegin: " + selectionBegin + " SelectionEnd: " + selectionEnd);
-                Debug.Log("Anchor: " + OutputField.selectionAnchorPosition + " Focus: " + OutputField.selectionFocusPosition);
-                Debug.Log("Selected: " + new string(OutputField.text.Skip(selectionBegin).Take(selectionEnd - selectionBegin).ToArray()));
             }
 
         }                 
