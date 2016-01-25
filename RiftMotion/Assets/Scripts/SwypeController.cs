@@ -13,7 +13,7 @@ public class SwypeController : MonoBehaviour
     private readonly int nTopSuggestions = 3;
     private string[] topSuggestions;
     public GameObject[] SuggestionFields;
-    private List<string> text;
+    private List<char> text;
     private List<float> durations;
     public InputField OutputField;
     public InputField InputString;
@@ -28,8 +28,8 @@ public class SwypeController : MonoBehaviour
 	// Use this for initialization
 	void Start () {
         charList = new List<char>();
-        text = new List<string>();
-        SuggestionFields = GameObject.FindGameObjectsWithTag("SuggestionField");
+        text = new List<char>();
+        SuggestionFields = FindSuggestionFields();
         anchorOld = -1;
         focusOld = -1;
         topSuggestions = new string[nTopSuggestions];
@@ -38,9 +38,12 @@ public class SwypeController : MonoBehaviour
         OutputField.OnPointerClick(new PointerEventData(EventSystem.current));
         OutputField.caretPosition = 0;
         durations = new List<float>();
+    }
 
-
-
+    private GameObject[] FindSuggestionFields()
+    {
+        List<GameObject> fields = GameObject.FindGameObjectsWithTag("SuggestionField").ToList();
+        return fields.OrderBy(go => go.name).ToArray<GameObject>();
     }
 
     public void Update()
@@ -57,19 +60,27 @@ public class SwypeController : MonoBehaviour
             durations.Add(duration);
     }
 
+    public void clearChars()
+    {
+        if (charList.Count != 0) //sometimes happens with backspace
+            EndOfInput();
+        else
+            charList.Clear();
+    }
+
     public void Typing(char character)
     {
         if (!isTyping) //first character
         {
             charList.Add(character);
-            text.Add(new string(charList.ToArray()));
+            text.Add(character);
             isTyping = true;
             WriteText();
         }
         else if(isTyping)
         {
             charList.Add(character);
-            text[text.Count - 1] = new string(charList.ToArray());
+            text.Add(character);
             WriteText();
         }
         if (character == ' ')
@@ -87,20 +98,30 @@ public class SwypeController : MonoBehaviour
         string input = new string(charList.ToArray());
         charList.Clear();
         
-        Debug.Log("input string: " + input);
+        Debug.Log("input string: ");
         string[] suggestions = new string[0];
 
         if (input.Length > 1)
         {
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input);//sent durations
+            bool allCaps = input.All(c => char.IsUpper(c));
+            
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
             for (int i = 0; i < durations.Count; i++)
+            {
                 Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
+            }
             durations.Clear();
-            suggestions = response.suggestions;
+
+            if(allCaps) //make lowercase response uppercase again
+            {
+                suggestions = response.suggestions.ToList().ConvertAll(s => s.ToUpper()).ToArray();
+            }
+            else 
+                suggestions = response.suggestions;
         }
         else if (input.Length == 1)// user types 1 single character
         {
-            text.Add(input);
+            text.Add(input[0]);
             WriteText();
             return topSuggestions;
         }
@@ -111,7 +132,7 @@ public class SwypeController : MonoBehaviour
         {
             if (suggestions.Length > i)
             {
-                string suggestion = suggestions[i];
+                string suggestion = suggestions[i] + " ";//adding spacing
                 SetText(SuggestionFields[i], suggestion);
                 topSuggestions[i] = suggestion;
 
@@ -123,7 +144,7 @@ public class SwypeController : MonoBehaviour
                 SetText(SuggestionFields[i], "");
             }
         }
-        text.Add(topSuggestions[0]);//first and most likely suggestion
+        text.AddRange(topSuggestions[0].ToCharArray());//first and most likely suggestion
         WriteText();
         input = "";
         return topSuggestions; //maak hier later een empty list/array/enumarable van
@@ -137,6 +158,7 @@ public class SwypeController : MonoBehaviour
 
     private void WriteText()
     {
+        /*
         string output = "";
         foreach(string s in text)
         {
@@ -147,6 +169,8 @@ public class SwypeController : MonoBehaviour
                 output += s;
         }
         Debug.Log("Total text: " + output);
+        */
+        string output = new string(text.ToArray());
 
         OutputField.text = output;
         OutputField.caretPosition = OutputField.text.Length;
@@ -154,10 +178,37 @@ public class SwypeController : MonoBehaviour
 
     public void setSuggestion(int index)
     {
-        Debug.Log(index);
-        text[text.Count-1] = topSuggestions[index];
-        WriteText();
+        if(SuggestionFields[index].GetComponentInChildren<Text>().text != "")
+        {
+            string[] words = getWords();
+            string LastWord = words[words.Length - 2];//last space also included
+            foreach (string s in words)
+                Debug.Log("Word:" + s + ";");
+            Debug.Log(text.Count - 1 - LastWord.Length + " " + LastWord.Length);
+            text.RemoveRange(text.Count - 1 - LastWord.Length, LastWord.Length + 1); //remove some extra cause of " " spacing
+            text.AddRange((topSuggestions[index]).ToCharArray());
+            Debug.Log("Suggestion:" + topSuggestions[index] + ";");
+
+            WriteText();
+        }
+
     }
+
+    private void clearSuggestions()
+    {
+        foreach(GameObject field in SuggestionFields)
+        {
+            SetText(field, "");
+        }
+    }
+
+
+    public string[] getWords()
+    {
+        string fullText = new string(text.ToArray());
+        return fullText.Split(' ');
+    }
+
 
     public void GetHighlightedText()
     {
@@ -192,6 +243,25 @@ public class SwypeController : MonoBehaviour
 
         }                 
         
+    }
+
+    //Unused
+    public void SelectText(Vector3 pos)
+    {
+        Debug.Log("Postion: " + pos.ToString());
+        float width = OutputField.GetComponent<RectTransform>().rect.width;
+        float height = OutputField.GetComponent<RectTransform>().rect.height;
+        //Debug.Log("Rect pos: " + OutputField.GetComponent<RectTransform>().transform.InverseTransformPoint(pos));
+        //Debug.Log("width: " + width + " height:  " + height);
+        Vector2 selectPos = new Vector2(pos.x + width / 2, pos.y + height / 2);
+        //Debug.Log("Selected position : " + selectPos);
+    }
+
+    public void backspace()
+    {
+        text.RemoveAt(text.Count - 1);
+        clearSuggestions();
+        WriteText();
     }
 
 }
