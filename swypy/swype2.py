@@ -60,7 +60,7 @@ def score(query, word, hints,i):
 
     return edit_distance(query, hints[i]), word, hints
 
-def get_suggestions(query, durations, text,result1,result2, n=5):
+def get_suggestions(query, durations, text, n=5):
 
     word_todo = WORDS
     score_avg = np.zeros(10)
@@ -87,8 +87,24 @@ def get_suggestions(query, durations, text,result1,result2, n=5):
     results = sorted(results, key=itemgetter(0))
 
     results = [(int(x), y) for (x, y) in results]
-    return lu.decide(text,results[:n],result1,result2)
 
+    results = same_distance(results, n)
+    
+    return results
+
+
+def same_distance(results, index):
+    if index == 0:
+        return results
+        
+    if (results[index][0] == results[index-1][0]):
+        results[index-1:index+1] = lu.decide(results[index-1:index+1])
+
+    return same_distance(results, index-1)
+    
+        
+
+    
 def run_test_cases():
 
     test_cases = ['hytrerfghjkllo',          # hello

@@ -1,25 +1,35 @@
 from __future__ import division
 from ast import literal_eval as le
 import time
-ngrams = {}
+ngram = {}
+bigram = {}
 
 start = time.time()
 
-print "Loading ngrams..."
+print "Loading ngram and bigram..."
 
 with open('correctedsingles.txt', 'r') as f: #takes about half a second
 	for line in f:
 		tup = le(line)
-		ngrams[tup[0]] = tup[1]
+		ngram[tup[0]] = tup[1]
+
+with open('correctedbigrams.txt', 'r') as f:
+        for line in f:
+            tup = le(line);
+           # line.append(le(line.strip()))    #working on this
 	
 print "Loading done, elpsed time: " + str(time.time()-start)
 
-def uniget(poss,result1):        
-    indices = [(x[0],x[1]) for x in result1 if x[0] in poss]
-    indices = sorted(indices,key=lambda x:(-x[1],x[0]))
-    result = [x[0] for x in indices]
-    return result
-
+"""
+Assumes only 2 possible words
+"""
+def uniget(poss):
+    
+    if(poss[0][1] in ngram and poss[1][1] in ngram and ngram[poss[0][1]] > ngram[poss[1][1]]):
+        return poss
+    else:
+        return poss[::-1] #reversed poss
+        
 def find(poss,result1):
     for each in result1:
         if each[0] == poss:
@@ -35,12 +45,12 @@ def biget(prev,poss,result1,result2):
     result = [x[0] for x in indices]
     return result
 
-def decide(prev, poss, result1, result2):
-    if not prev=="":    
-        if prev in [thisone[1] for thisone in result2]:
-            return biget(prev,poss,result1,result2)
-    else:
-        return uniget(poss,result1)
+def decide(poss, prev = ""):
+#    if not prev=="":    
+#        if prev in [thisone[1] for thisone in result2]:
+#            return biget(prev,poss,result1,result2)
+#    else:
+    return uniget(poss)
 
 #print(getbest('',['aardvark', 'aback', 'abaft']))
 #print(getbest('the',['abalone','abbess','abbe','abbot','aardvark','above']))
