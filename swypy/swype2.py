@@ -13,7 +13,7 @@ from tqdm import tqdm
 WORDS = open('wordlist.txt').read().split()
 WORDS = sorted(WORDS)
 N_HINTS = [sh.n_swipehints_opts(word)[0] for word in WORDS]
-
+Emptylist=True
 SWYPE_HINTS = []
 N_FRACTIONS = 50
 FRACTIONS = np.linspace(0,1,N_FRACTIONS)
@@ -66,8 +66,11 @@ def get_suggestions(query, durations, text, n=5):
     score_min = np.ones(10) * 99999
     hints = SWYPE_HINTS
     get_fitting_words(query,durations)
-    WORDS = open('wordlist2.txt').read().split()
-    word_todo = sorted(WORDS)
+
+    word_todo = WORDS#sorted(open('wordlist2.txt').read().split())
+    if len(word_todo)<1:
+        word_todo=WORDS
+        print "Word not found using timings, whole word list is used!"
     for i in xrange(len(FRACTIONS)):
         results = [score(query, word, hint, i) for word, hint in izip(word_todo, hints)]
 
@@ -116,7 +119,10 @@ def get_fitting_words(charlist,timelist): #(wordlist, list of characters from sw
 
 
         if inword:
-         WORDS2.write(word+"\n")
+            WORDS2.write(word+"\n")
+
+
+    print "chars in word:", char_in_word
     WORDS2.close
 
 def run_test_cases():
