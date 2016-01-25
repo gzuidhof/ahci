@@ -22,6 +22,8 @@ def get_tasks():
         suggestions = swype.get_suggestions(query, 0, lastWord)
         #suggestions = swype.get_suggestions("".join(charlist),durations,text,result1,result2) 
         suggestions = zip(*suggestions) if len(suggestions) > 0 else []
+        print "Result: " 
+        print suggestions
         print "Elapsed time getting suggestions {:5.1f}ms".format((time.time()-t)*1000)
         return jsonify({'query':query, 'suggestions':suggestions, 'error':'None'})
     else:

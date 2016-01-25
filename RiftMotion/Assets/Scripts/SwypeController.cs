@@ -107,19 +107,24 @@ public class SwypeController : MonoBehaviour
             string[] words = getWords();
             string lastWord = "";
             Debug.Log(words.Length+ "Content" + words[0] +  ";");
-            if (words.Length > 1)//words always containts a empty string for some reason
+            if (words.Length > 1)//words always containts an empty string for some reason
             {
                 lastWord = words[words.Length - 2];
             }
 			input+= "*" + FloatToString(durations) + "*" +  lastWord; //character string + durations + last word
             durations.Clear();
 			
-            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//sent durations
+            SuggestAPIResponse response = SuggestAPI.GetSuggestions(input.ToLower());//send durations
             for (int i = 0; i < durations.Count; i++)
             {
                 Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
             }
             durations.Clear();
+            Debug.Log(response.ToString());
+            foreach(string resp in response.suggestions)
+            {
+                Debug.Log("Suggestion: " + resp);
+            }
 
             if(allCaps) //make lowercase response uppercase again
             {
@@ -167,18 +172,6 @@ public class SwypeController : MonoBehaviour
 
     private void WriteText()
     {
-        /*
-        string output = "";
-        foreach(string s in text)
-        {
-            Debug.Log(s);
-            if (s.Length > 1)
-                output += s + " ";
-            else
-                output += s;
-        }
-        Debug.Log("Total text: " + output);
-        */
         string output = new string(text.ToArray());
 
         OutputField.text = output;
