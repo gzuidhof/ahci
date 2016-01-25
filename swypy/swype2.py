@@ -7,6 +7,7 @@ import numpy as np
 import time
 import cPickle as pickle
 import os.path
+import lookup as lu
 from itertools import izip
 from tqdm import tqdm
 
@@ -59,7 +60,7 @@ def score(query, word, hints,i):
 
     return edit_distance(query, hints[i]), word, hints
 
-def get_suggestions(query, durations, text, n=5):
+def get_suggestions(query, durations, text,result1,result2, n=5):
 
     word_todo = WORDS
     score_avg = np.zeros(10)
@@ -86,7 +87,7 @@ def get_suggestions(query, durations, text, n=5):
     results = sorted(results, key=itemgetter(0))
 
     results = [(int(x), y) for (x, y) in results]
-    return results[:n]
+    return lu.decide(text,results[:n],result1,result2)
 
 def run_test_cases():
 

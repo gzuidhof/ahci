@@ -25,22 +25,13 @@ def biget(prev,poss):
     return result
     #return str(getmax2(indices))
 
-def decide(past, poss):
+def decide(past, poss,result1,result2):
     text = past.split(';')
     prev = text[len(text)-1]
     if prev in [thisone[1] for thisone in result2]:
         return biget(prev,poss)
     else:
         return uniget(poss)
-
-def getbest(past, poss):
-    with open('correctedsingles.txt', 'r') as f:
-        for line in f:
-            result1.append(literal_eval(line.strip()))  
-    with open('correctedbigrams.txt', 'r') as f:
-        for line in f:
-            result2.append(literal_eval(line.strip()))
-    return decide(past,poss)
 
 #print(getbest('',['aardvark', 'aback', 'abaft']))
 #print(getbest('the',['abalone','abbess','abbe','abbot','aardvark','above']))
