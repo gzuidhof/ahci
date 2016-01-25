@@ -9,7 +9,9 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
 
     public CanvasKeyboard keyboard;
     private float duration;
+    private float starttime;
     private bool onKey;
+    private char currentobject;
     
     // Use this for initialization
     void Start() {
@@ -20,6 +22,7 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
             keyboard = null;
             Debug.Log("No keyboard"); //should not happen
         }
+        starttime = 0;
         duration = 0;
         onKey = false;
     
@@ -27,13 +30,17 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
     }
     // Update is called once per frame
     void Update () {
-
+     //   if (onKey)
+       // {
+       //     duration += Time.deltaTime;
+       // }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        if (onKey)
-            duration += Time.deltaTime;
+       
+       
+      //  Debug.Log(currentobject + duration);
     }
 
 
@@ -44,29 +51,33 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
         if(eventData.dragging && gameObject.name.Length == 1)
         {
             Debug.Log("Entering: " + gameObject.name);
-            onKey = true;
+           
+                currentobject = gameObject.name[0];
+                Debug.Log("HIER"+currentobject);
+          
             //AddCharacter();
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        Debug.Log("CLICK! " + gameObject.name[0]);
         onKey = true;
+        starttime = Time.time;
         /*
         if (gameObject.name.Length == 1) {
             AddCharacter();
             Debug.Log("OnDown: " + gameObject.name);
         }
         */
-        
+
     }
 
     private void AddCharacter()
     {
-        Debug.Log("DragAdding: " + gameObject.name[0]);
-                
+        Debug.Log("DragAdding: " + duration+ gameObject.name[0]);
         keyboard.swyper.AddCharacter(gameObject.name[0], duration);
-        duration = 0;
+        
     }
 
     private void DraggingDone()
@@ -74,23 +85,31 @@ public class DragHandler : MonoBehaviour, IDragHandler, IPointerExitHandler, IPo
         String input = keyboard.text;
         Debug.Log(input);
         keyboard.getSuggestion();
-        keyboard.text = "";       
+        keyboard.text = "";
     }
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        Debug.Log("LOS!" + gameObject.name);
+ 
         onKey = false;
-        AddCharacter();
+        Debug.Log(Time.time);
+        duration = Time.time - starttime;
+        starttime = Time.time;
+        //AddCharacter(); //deze weggehaald omdat hij als laatste character perse het eerste character wil invullen. Iets toevoegen als current object waarin het laatste geenterde character zit werkt ook neit want dat pst hij gewoon aan...
         keyboard.swyper.EndOfInput();
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if(eventData.dragging && gameObject.CompareTag("Key"))
-            {
-            onKey = false;
+        {
+            Debug.Log("TIJD:"+Time.time);
+            Debug.Log("TIJD2:" + starttime);//alleen eerste keer heeft starttime blijkbaar een waarde die niet 0 is...
+            Debug.Log("VERSCHIL:" + (Time.time - starttime));
+            duration = Time.time - starttime;
             AddCharacter();
-
+            starttime = Time.time;//dit werkt blijkbaar niet want starttime is hierna 0
         }
     }
 }
