@@ -120,11 +120,6 @@ public class SwypeController : MonoBehaviour
                 Debug.Log("Character: " + input[i] + " Time: " + durations[i]);
             }
             durations.Clear();
-            Debug.Log(response.ToString());
-            foreach(string resp in response.suggestions)
-            {
-                Debug.Log("Suggestion: " + resp);
-            }
 
             if(allCaps) //make lowercase response uppercase again
             {
