@@ -126,7 +126,7 @@ void Awake()
            
     }
 
-    private float timeNotPointing = 0f;
+    private float timeNotPointing = 1f; //Otherwise starts pointing from the beginning
 
     private void PointingUpdate(HandModel handModel)
     {
@@ -143,7 +143,7 @@ void Awake()
             timeNotPointing += Time.deltaTime;
         }
 
-        if (timeNotPointing < 0.36f){
+        if (timeNotPointing < 0.15){
             keepDrawing = true;
         }
 

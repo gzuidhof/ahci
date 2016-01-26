@@ -88,12 +88,12 @@ def get_suggestions(query, durations, text, n=5):
 
     results = [(int(x), y) for (x, y) in results]
 
-    results = same_distance(results, n)
+    results = same_distance(results, n, prev = text)
     
     return results
 
 
-def same_distance(results, index, prev = "the"):
+def same_distance(results, index, prev = ""):
     if index == 0:
         return results
         
